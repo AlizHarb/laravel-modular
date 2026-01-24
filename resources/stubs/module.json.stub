@@ -1,0 +1,6 @@
+{
+    "name": "{{name}}",
+    "namespace": "Modules\\{{name}}\\",
+    "provider": "Modules\\{{name}}\\Providers\\{{name}}ServiceProvider",
+    "active": true
+}

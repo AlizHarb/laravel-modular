@@ -1,0 +1,74 @@
+<?php
+
+declare(strict_types=1);
+
+use AlizHarb\Modular\Facades\Modular;
+use AlizHarb\Modular\ModuleRegistry;
+
+if (! function_exists('module')) {
+    /**
+     * Get the module registry or a specific module configuration.
+     *
+     * @param  string|null  $name
+     * @return ModuleRegistry|array<string, mixed>|null
+     */
+    function module(?string $name = null): mixed
+    {
+        /** @var ModuleRegistry $registry */
+        $registry = app(ModuleRegistry::class);
+
+        if (is_null($name)) {
+            return $registry;
+        }
+
+        return $registry->getModule($name);
+    }
+}
+
+if (! function_exists('module_path')) {
+    /**
+     * Get the absolute path to a module or a file within a module.
+     *
+     * @param  string  $module
+     * @param  string  $path
+     * @return string
+     */
+    function module_path(string $module, string $path = ''): string
+    {
+        /** @var ModuleRegistry $registry */
+        $registry = app(ModuleRegistry::class);
+
+        return $registry->resolvePath($module, $path);
+    }
+}
+
+if (! function_exists('module_config_path')) {
+    /**
+     * Get the absolute path to a module configuration file.
+     *
+     * @param  string  $module
+     * @param  string  $path
+     * @return string
+     */
+    function module_config_path(string $module, string $path = ''): string
+    {
+        return module_path($module, 'config/'.trim($path, '/'));
+    }
+}
+
+if (! function_exists('module_asset')) {
+    /**
+     * Get the URL for a modular asset.
+     *
+     * @param  string  $module
+     * @param  string  $path
+     * @return string
+     */
+    function module_asset(string $module, string $path): string
+    {
+        $module = strtolower($module);
+        $assetPath = config('modular.paths.assets', 'modules');
+        
+        return asset("{$assetPath}/{$module}/".ltrim($path, '/'));
+    }
+}

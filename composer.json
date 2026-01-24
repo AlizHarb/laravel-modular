@@ -1,0 +1,70 @@
+{
+    "name": "alizharb/laravel-modular",
+    "description": "A professional, framework-agnostic modular architecture for Laravel 11+. Features zero-config autoloading, 29+ Artisan command overrides, and seamless Vite integration.",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Ali Harb",
+            "email": "harbzali@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^8.2",
+        "illuminate/contracts": "^11.0|^12.0",
+        "spatie/laravel-package-tools": "^1.16",
+        "wikimedia/composer-merge-plugin": "^2.1"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^9.5|^10.0",
+        "pestphp/pest": "*",
+        "pestphp/pest-plugin-laravel": "*",
+        "phpstan/phpstan": "*",
+        "rector/rector": "*",
+        "driftingly/rector-laravel": "^2.1",
+        "larastan/larastan": "^3.9",
+        "phpunit/phpunit": "*",
+        "mockery/mockery": "*",
+        "spatie/phpunit-snapshot-assertions": "^5.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "AlizHarb\\Modular\\": "src/"
+        },
+        "files": [
+            "src/helpers.php"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "AlizHarb\\Modular\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "AlizHarb\\Modular\\ModularServiceProvider"
+            ],
+            "aliases": {
+                "Modular": "AlizHarb\\Modular\\Facades\\Modular"
+            }
+        },
+        "merge-plugin": {
+            "recurse": true,
+            "replace": false,
+            "ignore-duplicates": false,
+            "merge-dev": true,
+            "merge-extra": false,
+            "merge-extra-deep": false,
+            "merge-scripts": false
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "wikimedia/composer-merge-plugin": true,
+            "pestphp/pest-plugin": true
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}

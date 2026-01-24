@@ -1,0 +1,24 @@
+{
+    "name": "{{vendor}}/{{lowerName}}",
+    "description": "{{name}} Module",
+    "type": "{{type}}",
+    "license": "{{license}}",
+    "authors": [
+        {
+            "name": "{{authorName}}",
+            "email": "{{authorEmail}}"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Modules\\{{name}}\\": "app/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Modules\\{{name}}\\Providers\\{{name}}ServiceProvider"
+            ]
+        }
+    }
+}
