@@ -6,12 +6,15 @@ We override **29+ native Artisan commands** to provide a seamless "first-class" 
 
 ## ✨ Why Laravel Modular?
 
-building a modular application often feels like fighting the framework. You have to manually register service providers, configure weird autoloading rules, and fight with paths. 
+building a modular application often feels like fighting the framework. You have to manually register service providers, configure weird autoloading rules, and fight with paths.
 
 **Laravel Modular fixes this.**
 
 - 🏗️ **Native Experience**: Use `php artisan make:model Post --module=Blog` just like you normally would.
 - ⚡ **Zero Config**: Autoloading works out of the box via an intelligent `composer-merge-plugin` integration.
+- 🚀 **Performance First**: Built-in discovery caching for near-zero overhead in production.
+- 🔄 **Dynamic Activation**: Enable or disable modules on the fly without touching code.
+- 🔍 **Auto-Discovery**: Automatic registration of Artisan commands, Policies, and more.
 - 🔌 **Frontend Agnostic**: Works perfectly with Blade, Vue, React, Livewire, and Filament.
 - ✅ **Laravel 11 & 12 Ready**: Built on the latest PHP 8.2+ standards.
 

@@ -52,12 +52,79 @@ Create symbolic links from module assets to the public directory.
 ```bash
 # Link all module assets
 php artisan modular:link
-
-# Link specific module
-php artisan modular:link Blog
 ```
 
-This creates symlinks from `modules/Blog/resources/assets` to `public/modules/blog`.
+### `modular:cache`
+
+Create a cache file for faster module discovery. Highly recommended for production.
+
+```bash
+php artisan modular:cache
+```
+
+### `modular:clear`
+
+Remove the modular cache file.
+
+```bash
+php artisan modular:clear
+```
+
+### `module:enable`
+
+Enable a specific module dynamically.
+
+```bash
+php artisan module:enable Blog
+```
+
+### `module:disable`
+
+Disable a specific module dynamically.
+
+```bash
+php artisan module:disable Blog
+```
+
+### `modular:check`
+
+Check for circular dependencies between modules.
+
+```bash
+php artisan modular:check
+```
+
+### `modular:debug`
+
+Visualize module status, providers, paths, and middleware configuration.
+
+```bash
+php artisan modular:debug [Module]
+```
+
+### `modular:publish`
+
+Publish module assets, views, config, and translations.
+
+```bash
+php artisan modular:publish Blog
+```
+
+### `modular:test`
+
+Run tests for a specific module.
+
+```bash
+php artisan modular:test Blog
+```
+
+### `modular:ide-helper`
+
+Generate an IDE helper file (`_ide_helper_modular.php`) for better autocompletion.
+
+```bash
+php artisan modular:ide-helper
+```
 
 ## Standard Laravel Commands
 

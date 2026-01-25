@@ -19,7 +19,7 @@ trait HasResources
         $modules = $registry->getModules();
 
         foreach ($modules as $moduleName => $module) {
-            $this->loadModuleConfigs($moduleName, $registry);
+
         }
     }
 
@@ -37,32 +37,123 @@ trait HasResources
             $this->loadModuleViews($moduleName, $lowerName, $registry);
             $this->loadModuleTranslations($moduleName, $lowerName, $registry);
             $this->loadModuleMigrations($moduleName, $registry);
+            
+            if (config('modular.discovery.policies', true)) {
+                $this->discoverModulePolicies($moduleName, $registry);
+            }
+
+            if (config('modular.discovery.events', true)) {
+                $this->discoverModuleEvents($moduleName, $registry);
+            }
         }
 
-        $this->app->booted(fn () => $this->bootModuleRoutes($registry, $modules));
+
+        
+        $this->registerThemerIntegration($registry, $modules);
     }
 
     /**
-     * Load configuration files for a specific module.
+     * Discover and register policies within a module.
      */
-    protected function loadModuleConfigs(string $moduleName, ModuleRegistry $registry): void
+    protected function discoverModulePolicies(string $moduleName, ModuleRegistry $registry): void
     {
-        $lowerName = strtolower($moduleName);
-        $configPath = $registry->resolvePath($moduleName, 'config');
+        $cachedPolicies = $registry->getDiscoveredPolicies($moduleName);
+        
+        if (!empty($cachedPolicies)) {
+            foreach ($cachedPolicies as $model => $policy) {
+                \Illuminate\Support\Facades\Gate::policy($model, $policy);
+            }
+            return;
+        }
 
-        if (is_dir($configPath)) {
-            foreach (File::files($configPath) as $file) {
-                $configName = $file->getBasename('.php');
-                $this->mergeConfigFrom($file->getRealPath(), "{$lowerName}::{$configName}");
+        $policyPath = $registry->resolvePath($moduleName, 'app/Policies');
+        if (! is_dir($policyPath)) {
+            return;
+        }
+
+        foreach (File::allFiles($policyPath) as $file) {
+            $className = $file->getBasename('.php');
+            $module = $registry->getModule($moduleName);
+            $policyClass = rtrim($module['namespace'], '\\') . "\\Policies\\{$className}";
+            
+            if (class_exists($policyClass)) {
+                $modelName = str_replace('Policy', '', $className);
+                $modelClass = rtrim($module['namespace'], '\\') . "\\Models\\{$modelName}";
+                
+                if (class_exists($modelClass)) {
+                    \Illuminate\Support\Facades\Gate::policy($modelClass, $policyClass);
+                }
             }
         }
     }
+
+    /**
+     * Discover and register event listeners within a module.
+     */
+    protected function discoverModuleEvents(string $moduleName, ModuleRegistry $registry): void
+    {
+        $cachedEvents = $registry->getDiscoveredEvents($moduleName);
+        
+        if (!empty($cachedEvents)) {
+            foreach ($cachedEvents as $subscriber) {
+                // We currently only support subscribers in deep discovery for simplicity
+                 \Illuminate\Support\Facades\Event::subscribe($subscriber);
+            }
+            return;
+        }
+
+        $eventsPath = $registry->resolvePath($moduleName, 'app/Listeners');
+        if (! is_dir($eventsPath)) {
+            return;
+        }
+
+        foreach (File::allFiles($eventsPath) as $file) {
+            $className = $file->getBasename('.php');
+            $module = $registry->getModule($moduleName);
+            $listenerClass = rtrim($module['namespace'], '\\') . "\\Listeners\\{$className}";
+
+            if (class_exists($listenerClass)) {
+                if (method_exists($listenerClass, 'subscribe')) {
+                    \Illuminate\Support\Facades\Event::subscribe($listenerClass);
+                    continue;
+                }
+            }
+        }
+    }
+
+    /**
+     * Register integration with Laravel Themer if available.
+     *
+     * @param ModuleRegistry $registry
+     * @param array<string, mixed> $modules
+     */
+    protected function registerThemerIntegration(ModuleRegistry $registry, array $modules): void
+    {
+        if (class_exists('AlizHarb\\Themer\\ThemeServiceProvider')) {
+            /** @var \AlizHarb\Themer\ThemeServiceProvider $themer */
+            $themer = app('AlizHarb\\Themer\\ThemeServiceProvider');
+            
+            if (class_exists('AlizHarb\\Themer\\Plugins\\ModulesPlugin')) {
+                $pluginClass = 'AlizHarb\\Themer\\Plugins\\ModulesPlugin';
+                $themer::registerPlugin(new $pluginClass());
+            }
+        }
+    }
+
+
 
     /**
      * Load views and components for a specific module.
      */
     protected function loadModuleViews(string $moduleName, string $lowerName, ModuleRegistry $registry): void
     {
+        // Performance optimization: check cache first
+        if (config('modular.cache.enabled', false) || file_exists(config('modular.cache.path'))) {
+            if (!$registry->hasViews($moduleName)) {
+                return;
+            }
+        }
+
         $viewsPath = $registry->resolvePath($moduleName, 'resources/views');
 
         if (is_dir($viewsPath)) {
@@ -80,6 +171,13 @@ trait HasResources
      */
     protected function loadModuleTranslations(string $moduleName, string $lowerName, ModuleRegistry $registry): void
     {
+        // Performance optimization: check cache first
+        if (config('modular.cache.enabled', false) || file_exists(config('modular.cache.path'))) {
+            if (!$registry->hasTranslations($moduleName)) {
+                return;
+            }
+        }
+
         $langPath = $registry->resolvePath($moduleName, 'lang');
 
         if (is_dir($langPath)) {
@@ -92,6 +190,13 @@ trait HasResources
      */
     protected function loadModuleMigrations(string $moduleName, ModuleRegistry $registry): void
     {
+        // Performance optimization: check cache first
+        if (config('modular.cache.enabled', false) || file_exists(config('modular.cache.path'))) {
+            if (!$registry->hasMigrations($moduleName)) {
+                return;
+            }
+        }
+
         $migrationPath = $registry->resolvePath($moduleName, 'database/migrations');
 
         if (is_dir($migrationPath)) {
@@ -99,31 +204,7 @@ trait HasResources
         }
     }
 
-    /**
-     * Boot routes for all modules.
-     *
-     * @param  ModuleRegistry  $registry
-     * @param  array<string, mixed>  $modules
-     */
-    protected function bootModuleRoutes(ModuleRegistry $registry, array $modules): void
-    {
-        foreach ($modules as $moduleName => $module) {
-            $providerClass = $module['provider'] ?? '';
-            if ($providerClass && class_exists($providerClass)) {
-                $this->app->register($providerClass);
-            }
 
-            $routesPath = $registry->resolvePath($moduleName, 'routes');
-            
-            if (file_exists($routesPath . '/web.php')) {
-                $this->loadRoutesFrom($routesPath . '/web.php');
-            }
-            
-            if (file_exists($routesPath . '/api.php')) {
-                $this->loadRoutesFrom($routesPath . '/api.php');
-            }
-        }
-    }
 
     /**
      * Get the modular registry instance.

@@ -1,0 +1,55 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Laravel Modular Configuration",
+    "type": "object",
+    "properties": {
+        "$schema": {
+            "type": "string"
+        },
+        "name": {
+            "type": "string",
+            "description": "The name of the module."
+        },
+        "description": {
+            "type": "string",
+            "description": "A brief description of the module."
+        },
+        "version": {
+            "type": "string",
+            "description": "The semantic version of the module."
+        },
+        "authors": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "name": { "type": "string" },
+                    "email": { "type": "string", "format": "email" },
+                    "role": { "type": "string" }
+                },
+                "required": ["name"]
+            },
+            "description": "The authors of the module."
+        },
+        "namespace": {
+            "type": "string",
+            "description": "The PSR-4 namespace of the module."
+        },
+        "provider": {
+            "type": ["string", "null"],
+            "description": "The primary Service Provider for the module."
+        },
+        "requires": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            },
+            "description": "List of modules this module depends on."
+        },
+        "extra": {
+            "type": "object",
+            "description": "Any additional custom configuration."
+        }
+    },
+    "required": ["name"]
+}

@@ -37,6 +37,10 @@ class TestCase extends Orchestra
             ]));
         }
 
+        if (! is_dir($basePath.'/bootstrap/cache')) {
+            mkdir($basePath.'/bootstrap/cache', 0755, true);
+        }
+
         if (! is_dir(base_path('modules'))) {
             mkdir(base_path('modules'), 0755, true);
         }
@@ -52,6 +56,11 @@ class TestCase extends Orchestra
     public function getEnvironmentSetUp($app)
     {
         config()->set('database.default', 'testing');
+        
+        $basePath = __DIR__.'/../build/test-app';
+        
+        config()->set('modular.activators.file.statuses-file', $basePath.'/bootstrap/cache/modules_statuses.json');
+        config()->set('modular.cache.path', $basePath.'/bootstrap/cache/modular.php');
 
         /*
         $migration = include __DIR__.'/../database/migrations/create_laravel-modular_table.php.stub';

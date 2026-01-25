@@ -16,10 +16,13 @@ We override 29+ native Artisan commands to provide a seamless "first-class" modu
 
 - 🏗️ **Native Experience**: 29+ Artisan commands (`make:model`, `make:controller`, etc.) fully support `--module`.
 - ⚡ **Zero Config Autoloading**: Intelligent `composer-merge-plugin` integration for isolated module dependencies.
+- 🚀 **Performance First**: Built-in discovery caching (`modular:cache`) for near-zero overhead in production.
+- 🔄 **Dynamic Activation**: Enable or disable modules on the fly via `module:enable` and `module:disable`.
+- 🔍 **Auto-Discovery**: Automatic registration of Artisan commands, Policies, and Event Listeners within modules.
 - 🔌 **Decoupled Architecture**: Strictly typed `ModuleRegistry` and traits for maximum stability.
 - 🛠️ **Full Customizability**: Publishable stubs, dynamic config paths, and global helpers.
 - ✅ **Laravel 11 & 12 Ready**: Optimized for PHP 8.2+ and the latest framework features.
-- 🎨 **Asset Management**: Seamless Vite integration and asset linking.
+- 🎨 **Asset Management**: Seamless Vite integration via `modular_vite()` and asset linking.
 
 ---
 
@@ -76,6 +79,34 @@ php artisan modular:migrate Blog --fresh --seed
 
 # Run module seeders
 php artisan modular:seed Blog
+
+# Check for circular dependencies
+php artisan modular:check
+
+# Debug module configuration
+php artisan modular:debug Blog
+
+# Run module tests
+php artisan modular:test Blog
+```
+
+### Middleware & Config
+
+Define middleware in your `module.json`:
+
+```json
+"middleware": {
+    "web": ["Modules\\Blog\\Http\\Middleware\\TrackVisits"],
+    "blog.admin": "Modules\\Blog\\Http\\Middleware\\AdminGuard"
+}
+```
+
+Access config case-insensitively:
+
+```php
+// Both work!
+config('Blog::settings.key');
+config('blog::settings.key');
 ```
 
 ---

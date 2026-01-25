@@ -103,19 +103,6 @@ final class ModularMakeModuleCommand extends Command
      * @param  string  $name
      * @return void
      */
-    protected function createModuleJson(string $path, string $name): void
-    {
-        $content = $this->getStubContents('module.json.stub', ['name' => $name]);
-        File::put("{$path}/module.json", $content);
-    }
-
-    /**
-     * Create the composer.json file for the module.
-     *
-     * @param  string  $path
-     * @param  string  $name
-     * @return void
-     */
     protected function createComposerJson(string $path, string $name): void
     {
         $content = $this->getStubContents('composer.json.stub', [
@@ -128,6 +115,23 @@ final class ModularMakeModuleCommand extends Command
             'license' => (string) config('composer.license', 'MIT'),
         ]);
         File::put("{$path}/composer.json", $content);
+    }
+
+    /**
+     * Create the module.json file.
+     *
+     * @param  string  $path
+     * @param  string  $name
+     * @return void
+     */
+    protected function createModuleJson(string $path, string $name): void
+    {
+        $content = $this->getStubContents('module.json.stub', [
+            'name' => $name,
+            'authorName' => (string) config('modular.composer.author.name', 'Ali Harb'),
+            'authorEmail' => (string) config('modular.composer.author.email', 'harbzali@gmail.com'),
+        ]);
+        File::put("{$path}/module.json", $content);
     }
 
     /**

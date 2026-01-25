@@ -111,18 +111,18 @@ class ModularInstallCommand extends Command
             }
 
             $composer['extra']['merge-plugin']['include'] = $include;
-            $composer['extra']['merge-plugin']['recurse'] = true;
+            $composer['extra']['merge-plugin']['recurse'] = false;
             $composer['extra']['merge-plugin']['replace'] = false;
             $composer['extra']['merge-plugin']['merge-dev'] = true;
 
             File::put($composerJsonPath, (string) json_encode($composer, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
-            $this->info("Configured composer.json to include {$packageConfig} and {$relativeModulesPath}");
+            $this->components->info("Configured composer.json to include {$packageConfig} and {$relativeModulesPath}");
 
             if ($this->confirm('Run "composer dump-autoload" now?', true)) {
                 $this->call('composer', ['dump-autoload']);
             }
         } else {
-            $this->info('Composer merge settings already configured.');
+            $this->components->info('Composer merge settings already configured.');
         }
 
         if (isset($composer['autoload']['psr-4']['Modules\\'])) {

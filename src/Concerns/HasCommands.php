@@ -81,7 +81,46 @@ trait HasCommands
             ModularMigrateCommand::class,
             ModularSeedCommand::class,
             ModularLinkCommand::class,
+            \AlizHarb\Modular\Commands\ModularCacheCommand::class,
+            \AlizHarb\Modular\Commands\ModularClearCommand::class,
+            \AlizHarb\Modular\Commands\ModuleEnableCommand::class,
+            \AlizHarb\Modular\Commands\ModuleDisableCommand::class,
+            \AlizHarb\Modular\Commands\ModularCheckCommand::class,
+            \AlizHarb\Modular\Commands\ModularPublishCommand::class,
+            \AlizHarb\Modular\Commands\ModularTestCommand::class,
+            \AlizHarb\Modular\Commands\ModularDebugCommand::class,
+            \AlizHarb\Modular\Commands\ModularIdeHelperCommand::class,
         ]);
+
+        if (config('modular.discovery.commands', true)) {
+            $this->discoverModuleCommands();
+        }
+    }
+
+    /**
+     * Discover Artisan commands within modules.
+     */
+    protected function discoverModuleCommands(): void
+    {
+        $registry = $this->getModuleRegistry();
+        $modules = $registry->getModules();
+
+        foreach ($modules as $moduleName => $module) {
+            $commandPath = $module['path'].'/app/Console/Commands';
+
+            if (! is_dir($commandPath)) {
+                continue;
+            }
+
+            foreach (\Illuminate\Support\Facades\File::allFiles($commandPath) as $file) {
+                $relativePath = str_replace(['/', '.php'], ['\\', ''], $file->getRelativePathname());
+                $class = rtrim($module['namespace'], '\\').'\\Console\\Commands\\'.$relativePath;
+
+                if (class_exists($class) && ! (new \ReflectionClass($class))->isAbstract()) {
+                    $this->commands($class);
+                }
+            }
+        }
     }
 
     protected function registerMakeOverrides(): void

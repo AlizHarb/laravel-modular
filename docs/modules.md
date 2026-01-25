@@ -13,6 +13,44 @@ This command:
 2. Generates a `BlogServiceProvider`
 3. Creates `module.json` and `composer.json`
 4. Registers routes, views, and translations automatically
+5. Configures auto-discovery for commands and policies
+
+## Module Configuration (`module.json`)
+
+Each module contains a `module.json` file that defines its metadata.
+
+```json
+{
+    "$schema": "../../vendor/alizharb/laravel-modular/resources/schemas/module.schema.json",
+    "name": "Blog",
+    "description": "The official blog module.",
+    "version": "1.0.0",
+    "authors": [
+        {
+            "name": "Ali Harb",
+            "email": "harbzali@gmail.com"
+            "role": "Developer"
+        }
+    ],
+    "namespace": "Modules\\Blog\\",
+    "namespace": "Modules\\Blog\\",
+    "provider": "Modules\\Blog\\app\\Providers\\BlogServiceProvider",
+    "middleware": {
+        "web": ["Modules\\Blog\\Http\\Middleware\\TrackVisits"],
+        "blog.admin": "Modules\\Blog\\Http\\Middleware\\AdminGuard"
+    },
+    "requires": []
+}
+```
+
+### Metadata Features
+- **$schema**: Provides IDE autocompletion and validation for your module configuration.
+- **version**: Track module versions using semantic versioning.
+- **authors**: Define one or multiple authors with roles.
+- **requires**: Specify other modules that this module depends on.
+
+> [!NOTE]
+> The `active` status is now managed by the **Activator** system. Use `php artisan module:enable` and `disable` to manage it dynamically.
 
 ## Generating resources
 

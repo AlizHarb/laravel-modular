@@ -30,6 +30,14 @@ php artisan test
 
 ### Module-Specific Tests
 
+You can use the dedicated command:
+
+```bash
+php artisan modular:test Blog
+```
+
+Or run manually:
+
 ```bash
 php artisan test modules/Blog/tests
 ```

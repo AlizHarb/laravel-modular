@@ -72,3 +72,22 @@ if (! function_exists('module_asset')) {
         return asset("{$assetPath}/{$module}/".ltrim($path, '/'));
     }
 }
+
+if (! function_exists('modular_vite')) {
+    /**
+     * Get the Vite tags for modular assets.
+     *
+     * @param  string|array<int, string>  $entryPoints
+     * @param  string|null  $buildDirectory
+     * @return \Illuminate\Support\HtmlString
+     */
+    function modular_vite(string|array $entryPoints, ?string $buildDirectory = null): mixed
+    {
+        $buildDirectory = $buildDirectory ?: config('modular.paths.assets', 'modules');
+
+        /** @var \Illuminate\Foundation\Vite $vite */
+        $vite = app(\Illuminate\Foundation\Vite::class);
+
+        return $vite($entryPoints, $buildDirectory);
+    }
+}

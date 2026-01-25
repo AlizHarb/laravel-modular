@@ -75,6 +75,21 @@ Enable custom stubs to enforce your team's coding standards.
 
 Toggle automatic discovery of module resources.
 
+### Config Aliasing
+
+You can access module configuration using either the case-sensitive name or the lowercase alias:
+
+```php
+// Both work!
+config('Blog::settings.key');
+// Both work!
+config('Blog::settings.key');
+config('blog::settings.key');
+```
+
+> [!TIP]
+> You can disable aliasing to save memory by setting `modular.config.alias` to `false` in `config/modular.php`.
+
 ## Environment Variables
 
 You can set composer defaults in your `.env`:

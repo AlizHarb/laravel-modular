@@ -61,6 +61,18 @@ $imageUrl = module_asset('Blog', 'images/logo.png');
 <img src="{{ module_asset('Blog', 'images/logo.png') }}" alt="Logo">
 ```
 
+## `modular_vite()`
+
+A dedicated Vite helper for modular assets. It automatically targets the correct build directory.
+
+### Usage
+
+```blade
+{{ modular_vite(['resources/css/app.css', 'resources/js/app.js'], 'blog') }}
+```
+
+By default, it uses the `modular.paths.assets` configuration (usually `modules`).
+
 ## `module_config_path()`
 
 Get the absolute path to a module's config directory or file.
