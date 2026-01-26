@@ -32,26 +32,26 @@ class ModularIdeHelperCommand extends Command
         $modules = $registry->getModules();
 
         $content = "<?php\n\n/**\n * @method static mixed module(string \$name = null)\n */\nclass Modular {}\n\n";
-        
-        // Improve config() inference if possible? 
-        // A truly powerful IDE helper for config() requires deeper integration with barryvdh/laravel-ide-helper 
+
+        // Improve config() inference if possible?
+        // A truly powerful IDE helper for config() requires deeper integration with barryvdh/laravel-ide-helper
         // or generating a 'config/modules_ide.php' that Laravel IDE plugins can scan.
         // Let's create a meta file that exposes all module config keys purely for reference
         // or a PHPDoc for the `module()` helper.
-        
+
         $lines = [];
-        $lines[] = "namespace {";
-        $lines[] = "    // Available Modules:";
-        
+        $lines[] = 'namespace {';
+        $lines[] = '    // Available Modules:';
+
         foreach ($modules as $name => $config) {
-             $lines[] = "    // - {$name} (v{$config['version']})";
+            $lines[] = "    // - {$name} (v{$config['version']})";
         }
-        $lines[] = "}";
-        
+        $lines[] = '}';
+
         $output = implode("\n", $lines);
-        
+
         File::put(base_path('_ide_helper_modular.php'), $output);
-        
+
         $this->info('_ide_helper_modular.php generated.');
 
         return self::SUCCESS;

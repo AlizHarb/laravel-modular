@@ -10,6 +10,6 @@
         }
     ],
     "namespace": "Modules\\{{name}}\\",
-    "provider": "Modules\\{{name}}\\app\\Providers\\{{name}}ServiceProvider",
+    "provider": "Modules\\{{name}}\\Providers\\{{name}}ServiceProvider",
     "requires": []
 }

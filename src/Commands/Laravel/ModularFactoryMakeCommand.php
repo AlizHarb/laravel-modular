@@ -20,7 +20,6 @@ final class ModularFactoryMakeCommand extends FactoryMakeCommand
      * Get the destination class path.
      *
      * @param  string  $name
-     * @return string
      */
     protected function getPath($name): string
     {

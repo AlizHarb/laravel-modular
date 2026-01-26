@@ -20,7 +20,6 @@ final class ModularTestMakeCommand extends TestMakeCommand
      * Get the destination class path.
      *
      * @param  string  $name
-     * @return string
      */
     protected function getPath($name): string
     {
@@ -36,8 +35,6 @@ final class ModularTestMakeCommand extends TestMakeCommand
 
     /**
      * Get the root namespace for the class.
-     *
-     * @return string
      */
     protected function rootNamespace(): string
     {

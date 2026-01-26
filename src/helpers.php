@@ -9,7 +9,6 @@ if (! function_exists('module')) {
     /**
      * Get the module registry or a specific module configuration.
      *
-     * @param  string|null  $name
      * @return ModuleRegistry|array<string, mixed>|null
      */
     function module(?string $name = null): mixed
@@ -28,10 +27,6 @@ if (! function_exists('module')) {
 if (! function_exists('module_path')) {
     /**
      * Get the absolute path to a module or a file within a module.
-     *
-     * @param  string  $module
-     * @param  string  $path
-     * @return string
      */
     function module_path(string $module, string $path = ''): string
     {
@@ -45,10 +40,6 @@ if (! function_exists('module_path')) {
 if (! function_exists('module_config_path')) {
     /**
      * Get the absolute path to a module configuration file.
-     *
-     * @param  string  $module
-     * @param  string  $path
-     * @return string
      */
     function module_config_path(string $module, string $path = ''): string
     {
@@ -59,16 +50,12 @@ if (! function_exists('module_config_path')) {
 if (! function_exists('module_asset')) {
     /**
      * Get the URL for a modular asset.
-     *
-     * @param  string  $module
-     * @param  string  $path
-     * @return string
      */
     function module_asset(string $module, string $path): string
     {
         $module = strtolower($module);
         $assetPath = config('modular.paths.assets', 'modules');
-        
+
         return asset("{$assetPath}/{$module}/".ltrim($path, '/'));
     }
 }
@@ -78,7 +65,6 @@ if (! function_exists('modular_vite')) {
      * Get the Vite tags for modular assets.
      *
      * @param  string|array<int, string>  $entryPoints
-     * @param  string|null  $buildDirectory
      * @return \Illuminate\Support\HtmlString
      */
     function modular_vite(string|array $entryPoints, ?string $buildDirectory = null): mixed

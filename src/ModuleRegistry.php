@@ -16,18 +16,18 @@ final class ModuleRegistry
      * The collection of discovered modules.
      *
      * @var array<string, array{
-     *     path: string, 
-     *     name: string, 
-     *     namespace: string, 
-     *     providers: array<int, string>, 
-     *     middleware: array<int, string>, 
-     *     requires: array<int, string>, 
-     *     version: string, 
-     *     authors: array<int, array{name: string, email?: string, role?: string}>, 
-     *     policies?: array<string, string>, 
-     *     events?: array<string, array<int, string>|string>, 
-     *     has_views?: bool, 
-     *     has_translations?: bool, 
+     *     path: string,
+     *     name: string,
+     *     namespace: string,
+     *     providers: array<int, string>,
+     *     middleware: array<int, string>,
+     *     requires: array<int, string>,
+     *     version: string,
+     *     authors: array<int, array{name: string, email?: string, role?: string}>,
+     *     policies?: array<string, string>,
+     *     events?: array<string, array<int, string>|string>,
+     *     has_views?: bool,
+     *     has_translations?: bool,
      *     has_migrations?: bool
      * }>
      */
@@ -61,7 +61,7 @@ final class ModuleRegistry
 
         $path = config('modular.paths.modules', base_path('modules'));
 
-        if (!is_string($path) || !File::isDirectory($path)) {
+        if (! is_string($path) || ! File::isDirectory($path)) {
             return;
         }
 
@@ -69,10 +69,10 @@ final class ModuleRegistry
         $activator = $this->getActivator();
 
         foreach ($directories as $directory) {
-            $moduleJsonPath = $directory . '/module.json';
+            $moduleJsonPath = $directory.'/module.json';
             $name = basename($directory);
 
-            if (!$activator->isEnabled($name)) {
+            if (! $activator->isEnabled($name)) {
                 continue;
             }
 
@@ -87,7 +87,7 @@ final class ModuleRegistry
                 if (isset($config['provider'])) {
                     $providers[] = (string) $config['provider'];
                 }
-                
+
                 $middleware = isset($config['middleware']) ? (array) $config['middleware'] : [];
 
                 $requires = (array) ($config['requires'] ?? []);
@@ -152,15 +152,13 @@ final class ModuleRegistry
     public function cache(): void
     {
         $cachePath = config('modular.cache.path', base_path('bootstrap/cache/modular.php'));
-        $content = '<?php return ' . var_export($this->modules, true) . ';' . PHP_EOL;
+        $content = '<?php return '.var_export($this->modules, true).';'.PHP_EOL;
 
         File::put($cachePath, $content);
     }
 
     /**
      * Clear the modular discovery cache.
-     *
-     * @return void
      */
     public function clearCache(): void
     {
@@ -174,7 +172,6 @@ final class ModuleRegistry
     /**
      * Get the metadata for a specific module.
      *
-     * @param  string  $name
      * @return array{path: string, name: string, namespace: string, providers: array<int, string>, middleware: array<int, string>, requires: array<int, string>, version: string, authors: array<int, array{name: string, email?: string, role?: string}>, policies?: array<string, string>, events?: array<string, array<int, string>|string>, has_views?: bool, has_translations?: bool, has_migrations?: bool}|null
      */
     public function getModule(string $name): ?array
@@ -194,9 +191,6 @@ final class ModuleRegistry
 
     /**
      * Check if a module exists in the registry.
-     *
-     * @param  string  $name
-     * @return bool
      */
     public function moduleExists(string $name): bool
     {
@@ -205,47 +199,37 @@ final class ModuleRegistry
 
     /**
      * Resolve a fully qualified class name for a module.
-     *
-     * @param  string  $module
-     * @param  string  $class
-     * @return string
      */
     public function resolveNamespace(string $module, string $class): string
     {
         $moduleData = $this->getModule($module);
 
-        if (!$moduleData) {
+        if (! $moduleData) {
             return "Modules\\{$module}\\{$class}";
         }
 
-        return rtrim($moduleData['namespace'], '\\') . '\\' . trim($class, '\\');
+        return rtrim($moduleData['namespace'], '\\').'\\'.trim($class, '\\');
     }
 
     /**
      * Resolve the absolute path to a module resource.
-     *
-     * @param  string  $module
-     * @param  string  $path
-     * @return string
      */
     public function resolvePath(string $module, string $path = ''): string
     {
         $moduleData = $this->getModule($module);
 
-        if (!$moduleData) {
-            return base_path("modules/{$module}/" . trim($path, '/'));
+        if (! $moduleData) {
+            return base_path("modules/{$module}/".trim($path, '/'));
         }
 
-        return $moduleData['path'] . '/' . trim($path, '/');
+        return $moduleData['path'].'/'.trim($path, '/');
     }
 
     /**
      * Set the discovered resource mappings for a module.
      *
-     * @param  string  $moduleName
      * @param  array<string, string>  $policies
      * @param  array<int, string>  $events
-     * @return void
      */
     public function setDiscoveredResources(string $moduleName, array $policies, array $events): void
     {
@@ -258,7 +242,6 @@ final class ModuleRegistry
     /**
      * Get the cached policies for a module.
      *
-     * @param  string  $moduleName
      * @return array<string, string>
      */
     public function getDiscoveredPolicies(string $moduleName): array
@@ -269,7 +252,6 @@ final class ModuleRegistry
     /**
      * Get the cached event listeners for a module.
      *
-     * @param  string  $moduleName
      * @return array<string, array<int, string>|string>
      */
     public function getDiscoveredEvents(string $moduleName): array
@@ -279,12 +261,6 @@ final class ModuleRegistry
 
     /**
      * Set the existence flags for module resources.
-     *
-     * @param  string  $moduleName
-     * @param  bool  $views
-     * @param  bool  $translations
-     * @param  bool  $migrations
-     * @return void
      */
     public function setDiscoveredFlags(string $moduleName, bool $views, bool $translations, bool $migrations): void
     {
@@ -297,9 +273,6 @@ final class ModuleRegistry
 
     /**
      * Determine if the module has views.
-     *
-     * @param  string  $moduleName
-     * @return bool
      */
     public function hasViews(string $moduleName): bool
     {
@@ -308,9 +281,6 @@ final class ModuleRegistry
 
     /**
      * Determine if the module has translations.
-     *
-     * @param  string  $moduleName
-     * @return bool
      */
     public function hasTranslations(string $moduleName): bool
     {
@@ -319,9 +289,6 @@ final class ModuleRegistry
 
     /**
      * Determine if the module has migrations.
-     *
-     * @param  string  $moduleName
-     * @return bool
      */
     public function hasMigrations(string $moduleName): bool
     {

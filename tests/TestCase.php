@@ -56,9 +56,9 @@ class TestCase extends Orchestra
     public function getEnvironmentSetUp($app)
     {
         config()->set('database.default', 'testing');
-        
+
         $basePath = __DIR__.'/../build/test-app';
-        
+
         config()->set('modular.activators.file.statuses-file', $basePath.'/bootstrap/cache/modules_statuses.json');
         config()->set('modular.cache.path', $basePath.'/bootstrap/cache/modular.php');
 

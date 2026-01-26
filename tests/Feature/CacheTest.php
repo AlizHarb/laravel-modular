@@ -2,10 +2,9 @@
 
 namespace AlizHarb\Modular\Tests\Feature;
 
-use AlizHarb\Modular\ModuleRegistry;
 use AlizHarb\Modular\Tests\TestCase;
-use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\File;
 
 class CacheTest extends TestCase
 {
@@ -14,21 +13,21 @@ class CacheTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         $this->cachePath = base_path('bootstrap/cache/modular.php');
-        
+
         // Ensure clean state
         if (File::exists($this->cachePath)) {
             File::delete($this->cachePath);
         }
-        
+
         Config::set('modular.cache.path', $this->cachePath);
     }
 
     protected function tearDown(): void
     {
         if (File::exists($this->cachePath)) {
-             File::delete($this->cachePath);
+            File::delete($this->cachePath);
         }
         parent::tearDown();
     }
@@ -36,10 +35,10 @@ class CacheTest extends TestCase
     public function test_it_creates_cache_file()
     {
         $this->artisan('modular:cache')
-             ->assertSuccessful();
+            ->assertSuccessful();
 
         $this->assertFileExists($this->cachePath);
-        
+
         $cachedModules = require $this->cachePath;
         $this->assertIsArray($cachedModules);
     }
@@ -50,20 +49,20 @@ class CacheTest extends TestCase
         $this->assertFileExists($this->cachePath);
 
         $this->artisan('modular:clear')
-             ->assertSuccessful();
+            ->assertSuccessful();
 
         $this->assertFileDoesNotExist($this->cachePath);
     }
-    
+
     public function test_it_caches_discovered_resources()
     {
         // Setup a dummy module with a fake Policy or Event logic if possible.
         // For now, let's just verify the command runs 'Deep Discovery' logic without erroring
         // and produces a cache file with 'policies' and 'events' keys structure even if empty.
-        
+
         $this->artisan('modular:cache')
-             ->assertSuccessful();
-             
+            ->assertSuccessful();
+
         $cachedModules = require $this->cachePath;
         // Even if empty, the Registry.php logic ensures they exist if we look at real modules?
         // Wait, regular autodiscovery only writes modules if they exist.

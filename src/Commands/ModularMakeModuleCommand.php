@@ -29,14 +29,12 @@ final class ModularMakeModuleCommand extends Command
 
     /**
      * Execute the console command.
-     *
-     * @return int
      */
     public function handle(): int
     {
         $nameArg = $this->argument('name');
         $name = Str::studly((string) $nameArg);
-        
+
         $basePath = config('modular.paths.modules', base_path('modules'));
         $path = "{$basePath}/{$name}";
 
@@ -67,9 +65,6 @@ final class ModularMakeModuleCommand extends Command
 
     /**
      * Create the module directory structure.
-     *
-     * @param  string  $path
-     * @return void
      */
     protected function createDirectories(string $path): void
     {
@@ -98,10 +93,6 @@ final class ModularMakeModuleCommand extends Command
 
     /**
      * Create the module.json file.
-     *
-     * @param  string  $path
-     * @param  string  $name
-     * @return void
      */
     protected function createComposerJson(string $path, string $name): void
     {
@@ -119,10 +110,6 @@ final class ModularMakeModuleCommand extends Command
 
     /**
      * Create the module.json file.
-     *
-     * @param  string  $path
-     * @param  string  $name
-     * @return void
      */
     protected function createModuleJson(string $path, string $name): void
     {
@@ -136,10 +123,6 @@ final class ModularMakeModuleCommand extends Command
 
     /**
      * Create the main service provider for the module.
-     *
-     * @param  string  $path
-     * @param  string  $name
-     * @return void
      */
     protected function createServiceProvider(string $path, string $name): void
     {
@@ -149,10 +132,6 @@ final class ModularMakeModuleCommand extends Command
 
     /**
      * Create the route files for the module.
-     *
-     * @param  string  $path
-     * @param  string  $name
-     * @return void
      */
     protected function createRoutes(string $path, string $name): void
     {
@@ -165,19 +144,18 @@ final class ModularMakeModuleCommand extends Command
     /**
      * Get the contents of a stub file and replace placeholders.
      *
-     * @param  string  $stub
      * @param  array<string, string>  $replace
-     * @return string
+     *
      * @throws \Exception
      */
     protected function getStubContents(string $stub, array $replace = []): string
     {
-        $stubPath = __DIR__ . '/../../resources/stubs/' . $stub;
-        
-        if (config('modular.stubs.enabled') && File::exists($customPath = (string) config('modular.stubs.path') . '/' . $stub)) {
+        $stubPath = __DIR__.'/../../resources/stubs/'.$stub;
+
+        if (config('modular.stubs.enabled') && File::exists($customPath = (string) config('modular.stubs.path').'/'.$stub)) {
             $stubPath = $customPath;
         }
-        
+
         if (! File::exists($stubPath)) {
             throw new \Exception("Stub not found: {$stubPath}");
         }
@@ -185,7 +163,7 @@ final class ModularMakeModuleCommand extends Command
         $content = (string) File::get($stubPath);
 
         foreach ($replace as $key => $value) {
-            $content = str_replace(['{{' . $key . '}}', '{{ ' . $key . ' }}'], (string) $value, $content);
+            $content = str_replace(['{{'.$key.'}}', '{{ '.$key.' }}'], (string) $value, $content);
         }
 
         return $content;

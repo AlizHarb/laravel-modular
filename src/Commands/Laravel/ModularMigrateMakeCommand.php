@@ -36,8 +36,6 @@ final class ModularMigrateMakeCommand extends MigrateMakeCommand
 
     /**
      * Get the destination class path.
-     *
-     * @return string
      */
     protected function getMigrationPath(): string
     {

@@ -37,7 +37,7 @@ trait HasResources
             $this->loadModuleViews($moduleName, $lowerName, $registry);
             $this->loadModuleTranslations($moduleName, $lowerName, $registry);
             $this->loadModuleMigrations($moduleName, $registry);
-            
+
             if (config('modular.discovery.policies', true)) {
                 $this->discoverModulePolicies($moduleName, $registry);
             }
@@ -47,8 +47,6 @@ trait HasResources
             }
         }
 
-
-        
         $this->registerThemerIntegration($registry, $modules);
     }
 
@@ -58,11 +56,12 @@ trait HasResources
     protected function discoverModulePolicies(string $moduleName, ModuleRegistry $registry): void
     {
         $cachedPolicies = $registry->getDiscoveredPolicies($moduleName);
-        
-        if (!empty($cachedPolicies)) {
+
+        if (! empty($cachedPolicies)) {
             foreach ($cachedPolicies as $model => $policy) {
                 \Illuminate\Support\Facades\Gate::policy($model, $policy);
             }
+
             return;
         }
 
@@ -74,12 +73,12 @@ trait HasResources
         foreach (File::allFiles($policyPath) as $file) {
             $className = $file->getBasename('.php');
             $module = $registry->getModule($moduleName);
-            $policyClass = rtrim($module['namespace'], '\\') . "\\Policies\\{$className}";
-            
+            $policyClass = rtrim($module['namespace'], '\\')."\\Policies\\{$className}";
+
             if (class_exists($policyClass)) {
                 $modelName = str_replace('Policy', '', $className);
-                $modelClass = rtrim($module['namespace'], '\\') . "\\Models\\{$modelName}";
-                
+                $modelClass = rtrim($module['namespace'], '\\')."\\Models\\{$modelName}";
+
                 if (class_exists($modelClass)) {
                     \Illuminate\Support\Facades\Gate::policy($modelClass, $policyClass);
                 }
@@ -93,12 +92,13 @@ trait HasResources
     protected function discoverModuleEvents(string $moduleName, ModuleRegistry $registry): void
     {
         $cachedEvents = $registry->getDiscoveredEvents($moduleName);
-        
-        if (!empty($cachedEvents)) {
+
+        if (! empty($cachedEvents)) {
             foreach ($cachedEvents as $subscriber) {
                 // We currently only support subscribers in deep discovery for simplicity
-                 \Illuminate\Support\Facades\Event::subscribe($subscriber);
+                \Illuminate\Support\Facades\Event::subscribe($subscriber);
             }
+
             return;
         }
 
@@ -110,11 +110,12 @@ trait HasResources
         foreach (File::allFiles($eventsPath) as $file) {
             $className = $file->getBasename('.php');
             $module = $registry->getModule($moduleName);
-            $listenerClass = rtrim($module['namespace'], '\\') . "\\Listeners\\{$className}";
+            $listenerClass = rtrim($module['namespace'], '\\')."\\Listeners\\{$className}";
 
             if (class_exists($listenerClass)) {
                 if (method_exists($listenerClass, 'subscribe')) {
                     \Illuminate\Support\Facades\Event::subscribe($listenerClass);
+
                     continue;
                 }
             }
@@ -124,23 +125,20 @@ trait HasResources
     /**
      * Register integration with Laravel Themer if available.
      *
-     * @param ModuleRegistry $registry
-     * @param array<string, mixed> $modules
+     * @param  array<string, mixed>  $modules
      */
     protected function registerThemerIntegration(ModuleRegistry $registry, array $modules): void
     {
         if (class_exists('AlizHarb\\Themer\\ThemeServiceProvider')) {
             /** @var \AlizHarb\Themer\ThemeServiceProvider $themer */
             $themer = app('AlizHarb\\Themer\\ThemeServiceProvider');
-            
+
             if (class_exists('AlizHarb\\Themer\\Plugins\\ModulesPlugin')) {
                 $pluginClass = 'AlizHarb\\Themer\\Plugins\\ModulesPlugin';
-                $themer::registerPlugin(new $pluginClass());
+                $themer::registerPlugin(new $pluginClass);
             }
         }
     }
-
-
 
     /**
      * Load views and components for a specific module.
@@ -149,7 +147,7 @@ trait HasResources
     {
         // Performance optimization: check cache first
         if (config('modular.cache.enabled', false) || file_exists(config('modular.cache.path'))) {
-            if (!$registry->hasViews($moduleName)) {
+            if (! $registry->hasViews($moduleName)) {
                 return;
             }
         }
@@ -159,7 +157,7 @@ trait HasResources
         if (is_dir($viewsPath)) {
             $this->loadViewsFrom($viewsPath, $lowerName);
 
-            $componentPath = $viewsPath . '/components';
+            $componentPath = $viewsPath.'/components';
             if (is_dir($componentPath)) {
                 Blade::anonymousComponentPath($componentPath, $lowerName);
             }
@@ -173,7 +171,7 @@ trait HasResources
     {
         // Performance optimization: check cache first
         if (config('modular.cache.enabled', false) || file_exists(config('modular.cache.path'))) {
-            if (!$registry->hasTranslations($moduleName)) {
+            if (! $registry->hasTranslations($moduleName)) {
                 return;
             }
         }
@@ -192,7 +190,7 @@ trait HasResources
     {
         // Performance optimization: check cache first
         if (config('modular.cache.enabled', false) || file_exists(config('modular.cache.path'))) {
-            if (!$registry->hasMigrations($moduleName)) {
+            if (! $registry->hasMigrations($moduleName)) {
                 return;
             }
         }
@@ -204,8 +202,6 @@ trait HasResources
         }
     }
 
-
-
     /**
      * Get the modular registry instance.
      */
@@ -214,4 +210,3 @@ trait HasResources
         return $this->app->make(ModuleRegistry::class);
     }
 }
-

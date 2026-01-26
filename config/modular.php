@@ -31,13 +31,13 @@ return [
     |
     | Laravel Modular relies on consistent naming to automate discovery.
     |
-    | root_namespace: 
-    |   The primary namespace prefix used for all modules. When you run 
+    | root_namespace:
+    |   The primary namespace prefix used for all modules. When you run
     |   'php artisan make:module Blog', it will use 'Modules\Blog' by default.
     |
-    | resource_prefix: 
-    |   The unique identifier used when accessing modular resources like 
-    |   views, translations, or Blade components. 
+    | resource_prefix:
+    |   The unique identifier used when accessing modular resources like
+    |   views, translations, or Blade components.
     |   Example: <x-module:button /> or view('blog::index')
     |
     */
@@ -116,10 +116,10 @@ return [
     | generated composer.json. This ensures your modules are professionals,
     | personalized, and ready for distribution or internal consistency.
     |
-    | vendor: 
+    | vendor:
     |   Your organization or github handle. Used in 'vendor/module-name'.
     |
-    | author: 
+    | author:
     |   Populates the 'authors' array in the generated modular composer.json.
     |
     | type:
@@ -129,7 +129,7 @@ return [
     |   The default license for the generated composer.json.
     |
     | composer-output:
-    |   If enabled, Artisan will display raw output from any automated 
+    |   If enabled, Artisan will display raw output from any automated
     |   composer commands triggered during module creation.
     |
     */
@@ -183,4 +183,3 @@ return [
     ],
 
 ];
-

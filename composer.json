@@ -25,7 +25,8 @@
         "larastan/larastan": "^3.9",
         "phpunit/phpunit": "*",
         "mockery/mockery": "*",
-        "spatie/phpunit-snapshot-assertions": "^5.1"
+        "spatie/phpunit-snapshot-assertions": "^5.1",
+        "laravel/pint": "^1.24"
     },
     "autoload": {
         "psr-4": {
@@ -58,6 +59,12 @@
             "merge-extra-deep": false,
             "merge-scripts": false
         }
+    },
+    "suggest": {
+        "alizharb/laravel-hooks": "For modular hook system support",
+        "alizharb/laravel-modular-filament": "For Filament admin panel integration in modules",
+        "alizharb/laravel-modular-livewire": "For Livewire component support in modules",
+        "alizharb/laravel-themer": "For advanced theme management support"
     },
     "config": {
         "allow-plugins": {

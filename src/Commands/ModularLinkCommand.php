@@ -16,9 +16,6 @@ final class ModularLinkCommand extends Command
 
     /**
      * Execute the console command.
-     *
-     * @param  ModuleRegistry  $registry
-     * @return int
      */
     public function handle(ModuleRegistry $registry): int
     {
@@ -40,30 +37,26 @@ final class ModularLinkCommand extends Command
 
     /**
      * Create the symbolic link for a specific module.
-     *
-     * @param  string  $name
-     * @param  ModuleRegistry  $registry
-     * @param  string  $assetPath
-     * @return int
      */
     protected function linkModule(string $name, ModuleRegistry $registry, string $assetPath): int
     {
         $source = $registry->resolvePath($name, 'Resources/assets');
-        $target = public_path($assetPath . '/' . strtolower($name));
+        $target = public_path($assetPath.'/'.strtolower($name));
 
         if (! File::exists($source)) {
             return self::SUCCESS;
         }
 
         if (File::exists($target) && ! $this->option('force')) {
-            $this->warn("The [public/{$assetPath}/" . strtolower($name) . "] link already exists.");
+            $this->warn("The [public/{$assetPath}/".strtolower($name).'] link already exists.');
+
             return self::FAILURE;
         }
 
         if (File::exists($target)) {
             File::delete($target);
         }
-        
+
         // Ensure parent directory exists
         if (! File::exists(public_path($assetPath))) {
             File::makeDirectory(public_path($assetPath));

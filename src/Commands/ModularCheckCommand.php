@@ -33,7 +33,7 @@ class ModularCheckCommand extends Command
         $status = self::SUCCESS;
         $violations = [];
 
-        $this->components->info('Checking ' . count($modules) . ' modules for dependencies and architectural integrity...');
+        $this->components->info('Checking '.count($modules).' modules for dependencies and architectural integrity...');
 
         foreach ($modules as $name => $config) {
             $requires = $config['requires'] ?? [];
@@ -51,6 +51,7 @@ class ModularCheckCommand extends Command
                 if (! $registry->moduleExists($requiredModule)) {
                     $violations[] = "<fg=red>{$name}</> requires missing module <fg=yellow>{$requiredModule}</>";
                     $status = self::FAILURE;
+
                     continue;
                 }
 
@@ -58,12 +59,12 @@ class ModularCheckCommand extends Command
                 if ($constraint) {
                     $metadata = $registry->getModule($requiredModule);
                     $installedVersion = $metadata['version'] ?? 'unknown';
-                    
+
                     // Note: Full semver validation usually requires composer/semver.
                     // For now, we perform a basic "starts with" or exact check to avoid adding dependencies.
                     if (! $this->satisfies($installedVersion, $constraint)) {
-                         $violations[] = "<fg=red>{$name}</> requires <fg=yellow>{$requiredModule}:{$constraint}</>, but <fg=green>{$installedVersion}</> is installed.";
-                         $status = self::FAILURE;
+                        $violations[] = "<fg=red>{$name}</> requires <fg=yellow>{$requiredModule}:{$constraint}</>, but <fg=green>{$installedVersion}</> is installed.";
+                        $status = self::FAILURE;
                     }
                 }
             }
@@ -75,7 +76,7 @@ class ModularCheckCommand extends Command
         if (! empty($cycles)) {
             $this->components->error('Circular dependencies detected!');
             foreach ($cycles as $cycle) {
-                $this->line('  - ' . implode(' -> ', $cycle));
+                $this->line('  - '.implode(' -> ', $cycle));
             }
             $status = self::FAILURE;
         }
@@ -96,22 +97,18 @@ class ModularCheckCommand extends Command
 
     /**
      * Determine if a version satisfies a constraint (Basic implementation).
-     *
-     * @param  string  $version
-     * @param  string  $constraint
-     * @return bool
      */
     protected function satisfies(string $version, string $constraint): bool
     {
         $constraint = ltrim($constraint, '^~=');
-        
+
         return str_starts_with($version, $constraint);
     }
 
     /**
      * Detect cycles in a dependency graph.
      *
-     * @param array<string, array<int, string>> $graph
+     * @param  array<string, array<int, string>>  $graph
      * @return array<int, array<int, string>>
      */
     protected function detectCycles(array $graph): array

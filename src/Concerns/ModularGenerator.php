@@ -13,8 +13,6 @@ trait ModularGenerator
 {
     /**
      * Get the root namespace for the class.
-     * 
-     * @return string
      */
     protected function rootNamespace(): string
     {
@@ -31,7 +29,6 @@ trait ModularGenerator
      * Get the destination class path.
      *
      * @param  string  $name
-     * @return string
      */
     protected function getPath($name): string
     {
@@ -49,7 +46,6 @@ trait ModularGenerator
      * Get the default namespace for the class.
      *
      * @param  string  $rootNamespace
-     * @return string
      */
     protected function getDefaultNamespace($rootNamespace): string
     {

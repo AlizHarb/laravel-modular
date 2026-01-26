@@ -26,6 +26,17 @@ We override 29+ native Artisan commands to provide a seamless "first-class" modu
 
 ---
 
+## 🌍 Ecosystem
+
+Enhance your modular application with our official packages:
+
+- **[Laravel Hooks](https://github.com/AlizHarb/laravel-hooks)**: specific modular hook system support.
+- **[Filament Integration](https://github.com/AlizHarb/laravel-modular-filament)**: Seamless Filament admin panel integration in modules.
+- **[Livewire Integration](https://github.com/AlizHarb/laravel-modular-livewire)**: First-class Livewire component support in modules.
+- **[Laravel Themer](https://github.com/AlizHarb/laravel-themer)**: Advanced theme management system.
+
+---
+
 ## 🚀 Installation
 
 Install the package via Composer:
@@ -41,6 +52,53 @@ php artisan modular:install
 ```
 
 > **Note**: This will automatically install and configure `wikimedia/composer-merge-plugin` to handle your module dependencies.
+
+### Manual Setup
+If you prefer to configure things manually, follow these steps:
+
+**1. Composer Autoloading**
+Add the following to your root `composer.json` to ensure module namespaces are autoloaded:
+
+```json
+"autoload": {
+    "psr-4": {
+        "App\\": "app/",
+        "Modules\\": "modules/"
+    }
+},
+"extra": {
+    "merge-plugin": {
+        "include": [
+            "modules/*/composer.json"
+        ]
+    }
+}
+```
+
+**2. Vite Configuration**
+To enable hot-readling for module assets, create a `vite.modular.js` file in your root and update `vite.config.js`:
+
+```javascript
+// vite.config.js
+import { defineConfig } from 'vite';
+import laravel from 'laravel-vite-plugin';
+import { modularLoader } from './vite.modular.js';
+
+export default defineConfig({
+    plugins: [
+        laravel({
+            input: [
+                'resources/css/app.css', 
+                'resources/js/app.js',
+                ...modularLoader.inputs() // Add this line
+            ],
+            refresh: [
+                ...modularLoader.refreshPaths() // Add this line
+            ],
+        }),
+    ],
+});
+```
 
 ---
 

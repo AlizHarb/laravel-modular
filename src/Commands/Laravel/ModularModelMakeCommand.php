@@ -18,8 +18,6 @@ final class ModularModelMakeCommand extends ModelMakeCommand
 
     /**
      * Execute the console command.
-     *
-     * @return void
      */
     public function handle(): void
     {
@@ -57,8 +55,6 @@ final class ModularModelMakeCommand extends ModelMakeCommand
 
     /**
      * Create a model factory for the model.
-     *
-     * @return void
      */
     protected function createFactory(): void
     {
@@ -73,8 +69,6 @@ final class ModularModelMakeCommand extends ModelMakeCommand
 
     /**
      * Create a migration file for the model.
-     *
-     * @return void
      */
     protected function createMigration(): void
     {
@@ -93,8 +87,6 @@ final class ModularModelMakeCommand extends ModelMakeCommand
 
     /**
      * Create a seeder file for the model.
-     *
-     * @return void
      */
     final protected function createSeeder(): void
     {
@@ -108,8 +100,6 @@ final class ModularModelMakeCommand extends ModelMakeCommand
 
     /**
      * Create a controller for the model.
-     *
-     * @return void
      */
     final protected function createController(): void
     {
@@ -128,8 +118,6 @@ final class ModularModelMakeCommand extends ModelMakeCommand
 
     /**
      * Create a policy file for the model.
-     *
-     * @return void
      */
     final protected function createPolicy(): void
     {
@@ -144,8 +132,6 @@ final class ModularModelMakeCommand extends ModelMakeCommand
 
     /**
      * Create a form request file for the model.
-     *
-     * @return void
      */
     final protected function createRequest(): void
     {
@@ -164,8 +150,6 @@ final class ModularModelMakeCommand extends ModelMakeCommand
 
     /**
      * Create a resource file for the model.
-     *
-     * @return void
      */
     final protected function createResource(): void
     {

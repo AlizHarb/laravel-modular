@@ -30,9 +30,10 @@ class ModularPublishCommand extends Command
     public function handle(ModuleRegistry $registry, Filesystem $files): int
     {
         $name = $this->argument('module');
-        
+
         if (! $registry->moduleExists($name)) {
             $this->error("Module [{$name}] not found.");
+
             return self::FAILURE;
         }
 
@@ -60,10 +61,10 @@ class ModularPublishCommand extends Command
             $target = lang_path("vendor/{$lowerName}");
             $this->publishDirectory($files, $langPath, $target, 'lang', $force);
         }
-        
+
         // Publish Assets (Public)
         $assetsPath = $registry->resolvePath($name, 'resources/assets'); // Or public?
-        // Usually assets are source assets. 
+        // Usually assets are source assets.
         // If we want to publish compiled assets, we'd look for public.
         // Assuming we might have 'public' folder in module for static assets?
         // Let's assume standard structure: 'resources/css', 'resources/js' are handled by Vite.
@@ -86,7 +87,7 @@ class ModularPublishCommand extends Command
             $files->copyDirectory($from, $to);
             $this->components->task("Publishing {$type}", fn () => true);
         } else {
-             $this->components->warn("Skipped {$type} (already exists). Use --force to overwrite.");
+            $this->components->warn("Skipped {$type} (already exists). Use --force to overwrite.");
         }
     }
 }

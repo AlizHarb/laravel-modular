@@ -86,7 +86,7 @@ class FileActivator implements Activator
         }
 
         $content = File::get($this->path);
-        
+
         /** @var array<string, bool> $statuses */
         $statuses = json_decode($content, true) ?: [];
 

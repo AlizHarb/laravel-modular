@@ -29,12 +29,12 @@ class ModuleDisableCommand extends Command
     public function handle(ModuleRegistry $registry): int
     {
         $moduleName = (string) $this->argument('module');
-        
+
         $activator = $registry->getActivator();
         $activator->setStatus($moduleName, false);
 
         $this->components->info("Module [{$moduleName}] disabled successfully.");
-        
+
         $this->call('modular:clear');
 
         return self::SUCCESS;

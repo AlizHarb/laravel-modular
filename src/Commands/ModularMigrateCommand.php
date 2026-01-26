@@ -28,9 +28,6 @@ final class ModularMigrateCommand extends Command
 
     /**
      * Execute the console command.
-     *
-     * @param  ModuleRegistry  $registry
-     * @return int
      */
     public function handle(ModuleRegistry $registry): int
     {
@@ -49,10 +46,6 @@ final class ModularMigrateCommand extends Command
 
     /**
      * Run migrations for a specific module.
-     *
-     * @param  string  $name
-     * @param  ModuleRegistry  $registry
-     * @return int
      */
     protected function migrateModule(string $name, ModuleRegistry $registry): int
     {
@@ -60,6 +53,7 @@ final class ModularMigrateCommand extends Command
 
         if (! is_dir($path)) {
             $this->warn("No migrations found for module: {$name}");
+
             return self::SUCCESS;
         }
 

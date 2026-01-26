@@ -4,7 +4,6 @@ namespace AlizHarb\Modular\Tests\Feature;
 
 use AlizHarb\Modular\ModuleRegistry;
 use AlizHarb\Modular\Tests\TestCase;
-use Illuminate\Support\Facades\Route;
 
 class RoutingTest extends TestCase
 {
@@ -17,11 +16,11 @@ class RoutingTest extends TestCase
     public function test_it_registers_module_routes()
     {
         $provider = $this->app->getProvider(\AlizHarb\Modular\ModularServiceProvider::class);
-        
+
         // Ensure the method exists
         $this->assertTrue(method_exists($provider, 'registerModuleRoutes'));
-        
-        // Logic verification: checking if routesAreCached is respected is hard 
+
+        // Logic verification: checking if routesAreCached is respected is hard
         // without mocking the app state heavily, but we verified the code change.
     }
 }

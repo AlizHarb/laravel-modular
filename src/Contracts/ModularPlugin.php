@@ -14,28 +14,20 @@ interface ModularPlugin
 {
     /**
      * Get the unique identifier for the plugin.
-     *
-     * @return string
      */
     public function getId(): string;
 
     /**
      * Register services for all modules.
      *
-     * @param  Application  $app
-     * @param  ModuleRegistry  $registry
      * @param  array<string, mixed>  $modules
-     * @return void
      */
     public function register(Application $app, ModuleRegistry $registry, array $modules): void;
 
     /**
      * Boot services for all modules.
      *
-     * @param  Application  $app
-     * @param  ModuleRegistry  $registry
      * @param  array<string, mixed>  $modules
-     * @return void
      */
     public function boot(Application $app, ModuleRegistry $registry, array $modules): void;
 }

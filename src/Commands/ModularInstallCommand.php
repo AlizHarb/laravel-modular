@@ -29,8 +29,6 @@ class ModularInstallCommand extends Command
 
     /**
      * Execute the console command.
-     *
-     * @return int
      */
     public function handle(): int
     {
@@ -60,8 +58,6 @@ class ModularInstallCommand extends Command
 
     /**
      * Publish the package resources.
-     *
-     * @return void
      */
     protected function publishResources(): void
     {
@@ -82,8 +78,6 @@ class ModularInstallCommand extends Command
 
     /**
      * Configure composer.json for autoloading.
-     *
-     * @return void
      */
     protected function configureAutoloading(): void
     {
@@ -96,46 +90,51 @@ class ModularInstallCommand extends Command
         /** @var array<string, mixed> $composer */
         $composer = json_decode((string) File::get($composerJsonPath), true);
         $mergeConfig = $composer['extra']['merge-plugin'] ?? [];
-        $include = $mergeConfig['include'] ?? [];
+        $include = (array) ($mergeConfig['include'] ?? []);
 
-        $packageConfig = 'vendor/alizharb/laravel-modular/composer.json';
+        $modulesPath = config('modular.paths.modules', base_path('modules'));
+        $relativeModulesPath = Str::after((string) $modulesPath, base_path().'/').'/*/composer.json';
 
-        if (! in_array($packageConfig, $include)) {
-            $include[] = $packageConfig;
+        if (! in_array($relativeModulesPath, $include)) {
+            $this->components->warn('Modular autoloading needs to be configured in composer.json.');
 
-            $modulesPath = config('modular.paths.modules', base_path('modules'));
-            $relativeModulesPath = Str::after((string) $modulesPath, base_path().'/').'/*/composer.json';
-
-            if (! in_array($relativeModulesPath, $include)) {
+            if ($this->confirm('Would you like to automatically configure composer.json for modular autoloading?', true)) {
                 $include[] = $relativeModulesPath;
-            }
 
-            $composer['extra']['merge-plugin']['include'] = $include;
-            $composer['extra']['merge-plugin']['recurse'] = false;
-            $composer['extra']['merge-plugin']['replace'] = false;
-            $composer['extra']['merge-plugin']['merge-dev'] = true;
+                $composer['extra']['merge-plugin']['include'] = $include;
 
-            File::put($composerJsonPath, (string) json_encode($composer, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
-            $this->components->info("Configured composer.json to include {$packageConfig} and {$relativeModulesPath}");
+                File::put($composerJsonPath, (string) json_encode($composer, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+                $this->components->info("Configured composer.json to include {$relativeModulesPath}");
+                $this->warn('Please run "composer dump-autoload" to apply the changes.');
+            } else {
+                $this->components->info('To manually configure modular autoloading, add the following to your composer.json:');
 
-            if ($this->confirm('Run "composer dump-autoload" now?', true)) {
-                $this->call('composer', ['dump-autoload']);
+                $manualJson = [
+                    'extra' => [
+                        'merge-plugin' => [
+                            'include' => array_values(array_unique(array_merge($include, [$relativeModulesPath]))),
+                        ],
+                    ],
+                ];
+
+                $this->line("\n".(string) json_encode($manualJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)."\n");
+                $this->components->warn('Modular autoloading might not work until you add this configuration.');
             }
         } else {
             $this->components->info('Composer merge settings already configured.');
         }
 
         if (isset($composer['autoload']['psr-4']['Modules\\'])) {
-            unset($composer['autoload']['psr-4']['Modules\\']);
-            File::put($composerJsonPath, (string) json_encode($composer, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
-            $this->info('Removed legacy "Modules\\" PSR-4 autoloading.');
+            if ($this->confirm('Legacy "Modules\\" PSR-4 autoloading found. Remove it?', true)) {
+                unset($composer['autoload']['psr-4']['Modules\\']);
+                File::put($composerJsonPath, (string) json_encode($composer, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+                $this->info('Removed legacy "Modules\\" PSR-4 autoloading.');
+            }
         }
     }
 
     /**
-     * Configure Vite for modular views.
-     *
-     * @return void
+     * Configure Vite for modular views and assets.
      */
     protected function configureVite(): void
     {
@@ -145,11 +144,77 @@ class ModularInstallCommand extends Command
             return;
         }
 
+        $this->createViteModularLoader();
+
         $content = (string) File::get($viteConfigPath);
 
-        if (! str_contains($content, 'modules/')) {
-            $this->warn('Tip: To enable HMR for modular views, add the following to your Vite config watch or input paths:');
-            $this->line("'modules/**/resources/views/**/*.blade.php'");
+        if (! str_contains($content, 'vite.modular.js')) {
+            $this->components->warn('Vite needs to be configured to load modular assets.');
+
+            if ($this->confirm('Would you like to automatically configure vite.config.js?', true)) {
+                // Add modularLoader import - handle both single-line and multiline imports
+                if (! str_contains($content, 'modularLoader')) {
+                    // Try to find the vite import (single or multiline)
+                    if (preg_match('/import\s+\{[^}]*defineConfig[^}]*\}\s+from\s+[\'"]vite[\'"];?/', $content, $matches)) {
+                        $viteImport = $matches[0];
+                        $content = str_replace(
+                            $viteImport,
+                            $viteImport."\nimport { modularLoader } from './vite.modular.js';",
+                            $content
+                        );
+                    }
+                }
+
+                $content = preg_replace(
+                    "/input:\s*\[([^\]]+)\],/",
+                    "input: [\n                $1,\n                ...modularLoader.inputs()\n            ],",
+                    $content
+                );
+
+                // Try to find if refresh is already an array or true
+                if (str_contains($content, 'refresh: [')) {
+                    $content = str_replace(
+                        'refresh: [',
+                        "refresh: [\n                ...modularLoader.refreshPaths(),",
+                        $content
+                    );
+                } else {
+                    $content = preg_replace(
+                        "/refresh:\s*true,/",
+                        "refresh: [\n                ...modularLoader.refreshPaths(),\n                'resources/views/**',\n                'routes/**',\n            ],",
+                        $content
+                    );
+                }
+
+                File::put($viteConfigPath, $content);
+                $this->components->info('Configured vite.config.js to use the modular loader.');
+            } else {
+                $this->components->info('To manually configure Vite, add the following to your vite.config.js:');
+                $this->line("\nimport { modularLoader } from './vite.modular.js';\n");
+                $this->line('// In plugins -> laravel() configuration:');
+                $this->line("input: [\n    // ... existing inputs,\n    ...modularLoader.inputs()\n],");
+                $this->line("refresh: [\n    // ... existing paths,\n    ...modularLoader.refreshPaths()\n],");
+            }
+        }
+    }
+
+    /**
+     * Create the vite.modular.js loader file.
+     */
+    protected function createViteModularLoader(): void
+    {
+        $path = base_path('vite.modular.js');
+
+        if (File::exists($path)) {
+            return;
+        }
+
+        $stubPath = __DIR__.'/../../resources/stubs/vite.modular.js.stub';
+
+        if (File::exists($stubPath)) {
+            $content = (string) File::get($stubPath);
+            File::put($path, $content);
+            $this->components->info('Created vite.modular.js loader.');
         }
     }
 }

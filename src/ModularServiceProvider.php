@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace AlizHarb\Modular;
 
-use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Route;
 use Spatie\LaravelPackageTools\Package;
@@ -24,9 +23,6 @@ final class ModularServiceProvider extends PackageServiceProvider
 
     /**
      * Configure the package service provider.
-     *
-     * @param  Package  $package
-     * @return void
      */
     public function configurePackage(Package $package): void
     {
@@ -36,15 +32,12 @@ final class ModularServiceProvider extends PackageServiceProvider
             ->hasViews();
 
         $this->publishes([
-            __DIR__ . '/../resources/stubs' => base_path('stubs/modular'),
+            __DIR__.'/../resources/stubs' => base_path('stubs/modular'),
         ], 'modular-stubs');
     }
 
     /**
      * Register a modular plugin.
-     *
-     * @param  Contracts\ModularPlugin  $plugin
-     * @return void
      */
     public static function registerPlugin(Contracts\ModularPlugin $plugin): void
     {
@@ -53,8 +46,6 @@ final class ModularServiceProvider extends PackageServiceProvider
 
     /**
      * Register any package services.
-     *
-     * @return void
      */
     public function packageRegistered(): void
     {
@@ -81,8 +72,6 @@ final class ModularServiceProvider extends PackageServiceProvider
 
     /**
      * Bootstrap any package services.
-     *
-     * @return void
      */
     public function packageBooted(): void
     {
@@ -94,13 +83,14 @@ final class ModularServiceProvider extends PackageServiceProvider
         }
 
         $this->bootModularResources();
-        $this->registerModuleRoutes();
+
+        $this->app->booted(function () {
+            $this->registerModuleRoutes();
+        });
     }
 
     /**
      * Register module service providers.
-     * 
-     * @return void
      */
     protected function registerModuleProviders(): void
     {
@@ -116,8 +106,6 @@ final class ModularServiceProvider extends PackageServiceProvider
 
     /**
      * Register module configurations.
-     * 
-     * @return void
      */
     protected function registerModuleConfigs(): void
     {
@@ -135,10 +123,10 @@ final class ModularServiceProvider extends PackageServiceProvider
                 $filename = $file->getFilenameWithoutExtension();
                 $name = $module['name'];
                 $lowerName = strtolower($name);
-                
+
                 // Case-sensitive "Blog::settings"
                 $this->mergeConfigFrom($file->getPathname(), "{$name}::{$filename}");
-                
+
                 // Lowercase "blog::settings" (alias)
                 if (config('modular.config.alias', true) && $name !== $lowerName) {
                     $this->mergeConfigFrom($file->getPathname(), "{$lowerName}::{$filename}");
@@ -149,8 +137,6 @@ final class ModularServiceProvider extends PackageServiceProvider
 
     /**
      * Register module middleware.
-     * 
-     * @return void
      */
     protected function registerModuleMiddleware(): void
     {
@@ -161,13 +147,13 @@ final class ModularServiceProvider extends PackageServiceProvider
         foreach ($modules as $module) {
             foreach ($module['middleware'] ?? [] as $key => $middleware) {
                 if (is_string($key)) {
-                   if (is_array($middleware)) {
-                       foreach ($middleware as $m) {
-                           $router->pushMiddlewareToGroup($key, $m);
-                       }
-                   } else {
-                       $router->aliasMiddleware($key, $middleware);
-                   }
+                    if (is_array($middleware)) {
+                        foreach ($middleware as $m) {
+                            $router->pushMiddlewareToGroup($key, $m);
+                        }
+                    } else {
+                        $router->aliasMiddleware($key, $middleware);
+                    }
                 }
             }
         }
@@ -175,8 +161,6 @@ final class ModularServiceProvider extends PackageServiceProvider
 
     /**
      * Register module routes.
-     * 
-     * @return void
      */
     protected function registerModuleRoutes(): void
     {
@@ -206,23 +190,21 @@ final class ModularServiceProvider extends PackageServiceProvider
                     ->middleware('api')
                     ->group($api);
             }
-            
+
             // Channel Routes (Broadcasting)
-             if (File::exists($channels = "{$routesPath}/channels.php")) {
-                 require $channels;
-             }
-             
-             // Console Routes
-             if (File::exists($console = "{$routesPath}/console.php")) {
-                 require $console;
-             }
+            if (File::exists($channels = "{$routesPath}/channels.php")) {
+                require $channels;
+            }
+
+            // Console Routes
+            if (File::exists($console = "{$routesPath}/console.php")) {
+                require $console;
+            }
         }
     }
 
     /**
      * Register PSR-4 autoloading for modules.
-     *
-     * @return void
      */
     protected function registerAutoloading(): void
     {

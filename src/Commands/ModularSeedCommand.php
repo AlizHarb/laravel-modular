@@ -28,9 +28,6 @@ final class ModularSeedCommand extends Command
 
     /**
      * Execute the console command.
-     *
-     * @param  ModuleRegistry  $registry
-     * @return int
      */
     public function handle(ModuleRegistry $registry): int
     {
@@ -49,10 +46,6 @@ final class ModularSeedCommand extends Command
 
     /**
      * Seed a specific module.
-     *
-     * @param  string  $name
-     * @param  ModuleRegistry  $registry
-     * @return int
      */
     protected function seedModule(string $name, ModuleRegistry $registry): int
     {
@@ -61,6 +54,7 @@ final class ModularSeedCommand extends Command
 
         if (! class_exists((string) $fullClass)) {
             $this->warn("Seeder [{$fullClass}] not found for module: {$name}");
+
             return self::SUCCESS;
         }
 

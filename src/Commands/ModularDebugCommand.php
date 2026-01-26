@@ -34,14 +34,14 @@ class ModularDebugCommand extends Command
             return $this->debugModule($registry, $name);
         }
 
-        $this->info("Debugging All Modules");
+        $this->info('Debugging All Modules');
         $this->table(
             ['Name', 'Status', 'Path', 'Version'],
-            array_map(fn($m) => [
+            array_map(fn ($m) => [
                 $m['name'],
                 $registry->getActivator()->isEnabled($m['name']) ? 'Enabled' : 'Disabled',
                 $m['path'],
-                (string) ($m['version'] ?? '1.0.0')
+                (string) ($m['version'] ?? '1.0.0'),
             ], $registry->getModules())
         );
 
@@ -50,8 +50,9 @@ class ModularDebugCommand extends Command
 
     protected function debugModule(ModuleRegistry $registry, string $name): int
     {
-        if (!$registry->moduleExists($name)) {
+        if (! $registry->moduleExists($name)) {
             $this->error("Module [{$name}] not found.");
+
             return self::FAILURE;
         }
 
@@ -63,9 +64,9 @@ class ModularDebugCommand extends Command
         $this->components->twoColumnDetail('Namespace', $module['namespace']);
         $this->components->twoColumnDetail('Path', $module['path']);
         $this->components->twoColumnDetail('Version', $module['version']);
-        
+
         $this->newLine();
-        
+
         $this->info('Providers:');
         if (empty($module['providers'])) {
             $this->line('  <fg=gray>None</>');
@@ -90,18 +91,18 @@ class ModularDebugCommand extends Command
                         $this->line("    * {$m}");
                     }
                 } else {
-                     $this->line("  - Alias: [{$key}] => {$mw}");
+                    $this->line("  - Alias: [{$key}] => {$mw}");
                 }
             }
         }
-        
+
         $this->newLine();
         $this->info('Requires:');
         if (empty($module['requires'])) {
             $this->line('  <fg=gray>None</>');
         } else {
             foreach ($module['requires'] as $req) {
-                 $this->line("  - {$req}");
+                $this->line("  - {$req}");
             }
         }
 

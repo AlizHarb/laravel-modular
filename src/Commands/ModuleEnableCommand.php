@@ -29,12 +29,12 @@ class ModuleEnableCommand extends Command
     public function handle(ModuleRegistry $registry): int
     {
         $moduleName = (string) $this->argument('module');
-        
+
         $activator = $registry->getActivator();
         $activator->setStatus($moduleName, true);
 
         $this->components->info("Module [{$moduleName}] enabled successfully.");
-        
+
         $this->call('modular:clear');
 
         return self::SUCCESS;

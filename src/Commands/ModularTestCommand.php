@@ -6,7 +6,6 @@ namespace AlizHarb\Modular\Commands;
 
 use AlizHarb\Modular\ModuleRegistry;
 use Illuminate\Console\Command;
-use Symfony\Component\Console\Input\InputArgument;
 
 class ModularTestCommand extends Command
 {
@@ -37,14 +36,16 @@ class ModularTestCommand extends Command
         if ($moduleName) {
             if (! $registry->moduleExists($moduleName)) {
                 $this->error("Module [{$moduleName}] not found!");
+
                 return self::FAILURE;
             }
 
             $module = $registry->getModule($moduleName);
-            $testPath = $module['path'] . '/tests';
+            $testPath = $module['path'].'/tests';
 
             if (! is_dir($testPath)) {
                 $this->error("Module [{$moduleName}] has no tests directory.");
+
                 return self::FAILURE;
             }
 
@@ -52,16 +53,16 @@ class ModularTestCommand extends Command
             // But 'php artisan test' accepts file/dir arguments directly
             $args[] = $testPath;
         } else {
-             // Run all module tests? Or just fail?
-             // If no module, maybe run all modules/* tests?
-             $this->info("Running tests for all modules...");
-             $args[] = 'modules'; // Assuming modules are in 'modules' directory relative to base
+            // Run all module tests? Or just fail?
+            // If no module, maybe run all modules/* tests?
+            $this->info('Running tests for all modules...');
+            $args[] = 'modules'; // Assuming modules are in 'modules' directory relative to base
         }
 
         if ($filter) {
             $args[] = "--filter={$filter}";
         }
-        
+
         // Pass calling environment variables or usage
         return $this->call('test', $args);
     }
