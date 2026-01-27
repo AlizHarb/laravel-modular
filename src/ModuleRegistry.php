@@ -28,7 +28,11 @@ final class ModuleRegistry
      *     events?: array<string, array<int, string>|string>,
      *     has_views?: bool,
      *     has_translations?: bool,
-     *     has_migrations?: bool
+     *     has_migrations?: bool,
+     *     discovery_info?: array{
+     *         policies: array<string, string>,
+     *         events: array<string, string>
+     *     }
      * }>
      */
     protected array $modules = [];
@@ -108,6 +112,10 @@ final class ModuleRegistry
                     'has_views' => false,
                     'has_translations' => false,
                     'has_migrations' => false,
+                    'discovery_info' => [
+                        'policies' => [],
+                        'events' => [],
+                    ],
                 ];
             } else {
                 $this->modules[$name] = [
@@ -124,6 +132,10 @@ final class ModuleRegistry
                     'has_views' => false,
                     'has_translations' => false,
                     'has_migrations' => false,
+                    'discovery_info' => [
+                        'policies' => [],
+                        'events' => [],
+                    ],
                 ];
             }
         }
@@ -293,5 +305,25 @@ final class ModuleRegistry
     public function hasMigrations(string $moduleName): bool
     {
         return $this->modules[$moduleName]['has_migrations'] ?? false;
+    }
+
+    /**
+     * Set discovery source information for a specific resource type.
+     */
+    public function setDiscoverySource(string $moduleName, string $type, string $resource, string $source): void
+    {
+        if (isset($this->modules[$moduleName])) {
+            $this->modules[$moduleName]['discovery_info'][$type][$resource] = $source;
+        }
+    }
+
+    /**
+     * Get discovery source information for a module.
+     *
+     * @return array{policies: array<string, string>, events: array<string, string>}
+     */
+    public function getDiscoveryInfo(string $moduleName): array
+    {
+        return $this->modules[$moduleName]['discovery_info'] ?? ['policies' => [], 'events' => []];
     }
 }

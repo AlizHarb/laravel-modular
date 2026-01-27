@@ -135,8 +135,21 @@ php artisan modular:migrate
 # Migrate a specific module
 php artisan modular:migrate Blog --fresh --seed
 
+# Migrate a specific module
+php artisan modular:migrate Blog --fresh --seed
+
 # Run module seeders
 php artisan modular:seed Blog
+
+# List all modules and discovered resources
+php artisan modular:list
+
+# Sync module dependencies to root composer.json
+php artisan modular:sync
+
+# Run npm commands for a module (Workspaces)
+php artisan modular:npm Blog install
+php artisan modular:npm Blog build
 
 # Check for circular dependencies
 php artisan modular:check
@@ -147,6 +160,14 @@ php artisan modular:debug Blog
 # Run module tests
 php artisan modular:test Blog
 ```
+
+### 🏎️ Performance Optimization
+
+For maximum production performance, we recommended the following:
+
+1.  **Optimized PSR-4**: Ensure `"Modules\\": "modules/"` is in your root `composer.json`. `modular:install` handles this for you.
+2.  **Dependency Syncing**: Use `php artisan modular:sync` to merge module dependencies into your root `composer.json` and disable the merge-plugin.
+3.  **Discovery Caching**: Always run `php artisan modular:cache` in your deployment pipeline.
 
 ### Middleware & Config
 

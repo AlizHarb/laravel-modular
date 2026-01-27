@@ -31,8 +31,6 @@ class ModularTestCommand extends Command
         $moduleName = $this->argument('module');
         $filter = $this->option('filter');
 
-        $args = ['test'];
-
         if ($moduleName) {
             if (! $registry->moduleExists($moduleName)) {
                 $this->error("Module [{$moduleName}] not found!");
@@ -41,7 +39,8 @@ class ModularTestCommand extends Command
             }
 
             $module = $registry->getModule($moduleName);
-            $testPath = $module['path'].'/tests';
+            $modulePath = $module['path'];
+            $testPath = $modulePath.'/tests';
 
             if (! is_dir($testPath)) {
                 $this->error("Module [{$moduleName}] has no tests directory.");
@@ -49,21 +48,48 @@ class ModularTestCommand extends Command
                 return self::FAILURE;
             }
 
-            // Pass directory as argument to the test command (standard PHPUnit/Pest behavior)
-            // But 'php artisan test' accepts file/dir arguments directly
-            $args[] = $testPath;
+            // Check if module has its own test configuration (Zero-Config mode)
+            if (file_exists($modulePath.'/phpunit.xml')) {
+                $this->info("Running tests for module [{$moduleName}] using local configuration...");
+
+                $command = [
+                    base_path('vendor/bin/pest'),
+                ];
+
+                if ($filter) {
+                    $command[] = "--filter={$filter}";
+                }
+
+                if ($this->option('ansi')) {
+                    $command[] = '--colors=always';
+                }
+
+                // Execute the command from the module's directory
+                $process = new \Symfony\Component\Process\Process(
+                    $command,
+                    $modulePath,
+                    ['APP_ENV' => 'testing']
+                );
+
+                $process->setTty(false);
+                $process->run(function ($type, $buffer) {
+                    $this->output->write($buffer);
+                });
+
+                return $process->getExitCode();
+            }
+
+            // Fallback to standard 'php artisan test' if no local config
+            $args = ['test', $testPath];
         } else {
-            // Run all module tests? Or just fail?
-            // If no module, maybe run all modules/* tests?
             $this->info('Running tests for all modules...');
-            $args[] = 'modules'; // Assuming modules are in 'modules' directory relative to base
+            $args = ['test', 'modules'];
         }
 
         if ($filter) {
             $args[] = "--filter={$filter}";
         }
 
-        // Pass calling environment variables or usage
         return $this->call('test', $args);
     }
 }

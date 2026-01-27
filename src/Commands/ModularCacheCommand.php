@@ -30,6 +30,9 @@ class ModularCacheCommand extends Command
     {
         $this->call('modular:clear');
 
+        // Force reload of modules to ensure we have the fresh list from disk
+        $registry->discoverModules();
+
         $this->components->info('Discovering module resources...');
 
         // Deep Discovery:

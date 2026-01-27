@@ -60,6 +60,7 @@ trait HasResources
         if (! empty($cachedPolicies)) {
             foreach ($cachedPolicies as $model => $policy) {
                 \Illuminate\Support\Facades\Gate::policy($model, $policy);
+                $registry->setDiscoverySource($moduleName, 'policies', $model, 'Cached/Explicit');
             }
 
             return;
@@ -81,6 +82,7 @@ trait HasResources
 
                 if (class_exists($modelClass)) {
                     \Illuminate\Support\Facades\Gate::policy($modelClass, $policyClass);
+                    $registry->setDiscoverySource($moduleName, 'policies', $modelClass, 'Convention');
                 }
             }
         }
@@ -97,6 +99,7 @@ trait HasResources
             foreach ($cachedEvents as $subscriber) {
                 // We currently only support subscribers in deep discovery for simplicity
                 \Illuminate\Support\Facades\Event::subscribe($subscriber);
+                $registry->setDiscoverySource($moduleName, 'events', $subscriber, 'Cached/Explicit');
             }
 
             return;
@@ -115,6 +118,7 @@ trait HasResources
             if (class_exists($listenerClass)) {
                 if (method_exists($listenerClass, 'subscribe')) {
                     \Illuminate\Support\Facades\Event::subscribe($listenerClass);
+                    $registry->setDiscoverySource($moduleName, 'events', $listenerClass, 'Convention');
 
                     continue;
                 }

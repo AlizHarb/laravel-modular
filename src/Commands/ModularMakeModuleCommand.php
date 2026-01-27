@@ -51,6 +51,8 @@ final class ModularMakeModuleCommand extends Command
         $this->createComposerJson($path, $name);
         $this->createServiceProvider($path, $name);
         $this->createRoutes($path, $name);
+        $this->createTestConfig($path, $name);
+        $this->createAssets($path, $name);
 
         $this->info("Module [{$name}] created successfully.");
         $this->comment("Please run 'composer dump-autoload' and 'php artisan modular:install' if you haven't yet.");
@@ -77,7 +79,8 @@ final class ModularMakeModuleCommand extends Command
             'database/factories',
             'database/migrations',
             'database/seeders',
-            'resources/assets',
+            'resources/assets/js',
+            'resources/assets/css',
             'resources/views/components',
             'routes',
             'config',
@@ -139,6 +142,38 @@ final class ModularMakeModuleCommand extends Command
 
         File::put("{$path}/routes/web.php", $this->getStubContents('routes-web.stub', $vars));
         File::put("{$path}/routes/api.php", $this->getStubContents('routes-api.stub', $vars));
+    }
+
+    /**
+     * Create the test configuration files for the module.
+     */
+    protected function createTestConfig(string $path, string $name): void
+    {
+        $vars = [
+            'name' => $name,
+            'lowerName' => strtolower($name),
+            'appKey' => 'base64:'.base64_encode(random_bytes(32)),
+        ];
+
+        File::put("{$path}/tests/Pest.php", $this->getStubContents('tests-pest.stub', $vars));
+        File::put("{$path}/tests/bootstrap.php", $this->getStubContents('tests-bootstrap.stub', $vars));
+        File::put("{$path}/phpunit.xml", $this->getStubContents('phpunit.xml.stub', $vars));
+    }
+
+    /**
+     * Create the asset-related files (package.json, vite.config.js, app.js, app.css).
+     */
+    protected function createAssets(string $path, string $name): void
+    {
+        $vars = ['name' => $name, 'lowerName' => strtolower($name)];
+
+        // Configuration files
+        File::put("{$path}/package.json", $this->getStubContents('package.json.stub', $vars));
+        File::put("{$path}/vite.config.js", $this->getStubContents('vite.config.js.stub', $vars));
+
+        // Entry points
+        File::put("{$path}/resources/assets/js/app.js", "// JS entry point for {$name} module\n");
+        File::put("{$path}/resources/assets/css/app.css", "/* CSS entry point for {$name} module */\n");
     }
 
     /**
