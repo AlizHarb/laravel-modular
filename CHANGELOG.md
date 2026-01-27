@@ -2,6 +2,24 @@
 
 All notable changes to `laravel-modular` will be documented in this file.
 
+## v1.1.2 - 2026-01-27
+
+### Added
+
+- **New `modular:list` Command**: Visualize all registered modules, discovered policies, events, and their discovery sources (Convention vs Explicit).
+- **New `modular:sync` Command**: Sync module-specific dependencies from `modules/*/composer.json` into the root `composer.json` for optimized production performance.
+- **New `modular:npm` Command**: Manage module-level assets easily using NPM Workspaces from the Artisan console.
+- **Monorepo-lite Assets**: Each module now gets its own `package.json` and `vite.config.js` for isolated dependency and asset management.
+- **Discovery Tracking**: `ModuleRegistry` now tracks the source of discovered resources for better transparency.
+
+### Changed
+
+- **Optimized Autoloading**: `modular:install` now automatically adds PSR-4 autoloading for the Modules namespace to the root `composer.json`, significantly improving class loading performance.
+- **NPM Workspaces**: `modular:install` now configures the root `package.json` with NPM Workspaces for efficient module asset management.
+- **Improved Installation Flow**: The installation process is now more performance-focused and provides better guidance on optimized vs fallback autoloading.
+
+---
+
 ## v1.1.1 - 2026-01-26
 
 ### Added

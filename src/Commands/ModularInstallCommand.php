@@ -37,6 +37,8 @@ class ModularInstallCommand extends Command
         $this->publishResources();
         $this->configureAutoloading();
         $this->configureVite();
+        $this->createViteBaseHelper();
+        $this->configureNpmWorkspaces();
 
         $this->components->info('Laravel Modular has been successfully installed! 🚀');
         $this->comment('You can now create your first module using: php artisan make:module {name}');
@@ -89,48 +91,39 @@ class ModularInstallCommand extends Command
 
         /** @var array<string, mixed> $composer */
         $composer = json_decode((string) File::get($composerJsonPath), true);
+        
+        // 1. Configure standard PSR-4 for the Modules namespace
+        $rootNamespace = config('modular.naming.root_namespace', 'Modules').'\\';
+        $modulesPath = Str::after(config('modular.paths.modules', base_path('modules')), base_path().'/').'/';
+
+        if (! isset($composer['autoload']['psr-4'][$rootNamespace])) {
+            if ($this->confirm("Would you like to add optimized PSR-4 autoloading for '{$rootNamespace}' to your composer.json?", true)) {
+                $composer['autoload']['psr-4'][$rootNamespace] = $modulesPath;
+                File::put($composerJsonPath, (string) json_encode($composer, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+                $this->components->info("Added PSR-4 autoloading for '{$rootNamespace}' pointing to '{$modulesPath}'");
+            }
+        }
+
+        // 2. Configure Composer Merge Plugin for module-specific dependencies
         $mergeConfig = $composer['extra']['merge-plugin'] ?? [];
         $include = (array) ($mergeConfig['include'] ?? []);
+        $relativeMergePath = $modulesPath.'*/composer.json';
 
-        $modulesPath = config('modular.paths.modules', base_path('modules'));
-        $relativeModulesPath = Str::after((string) $modulesPath, base_path().'/').'/*/composer.json';
+        if (! in_array($relativeMergePath, $include)) {
+            $this->components->warn('Composer Merge Plugin is recommended for module-specific dependencies.');
 
-        if (! in_array($relativeModulesPath, $include)) {
-            $this->components->warn('Modular autoloading needs to be configured in composer.json.');
-
-            if ($this->confirm('Would you like to automatically configure composer.json for modular autoloading?', true)) {
-                $include[] = $relativeModulesPath;
-
+            if ($this->confirm('Would you like to automatically configure it?', true)) {
+                $include[] = $relativeMergePath;
                 $composer['extra']['merge-plugin']['include'] = $include;
+                $composer['extra']['merge-plugin']['recurse'] = true;
+                $composer['extra']['merge-plugin']['merge-dev'] = true;
 
                 File::put($composerJsonPath, (string) json_encode($composer, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
-                $this->components->info("Configured composer.json to include {$relativeModulesPath}");
-                $this->warn('Please run "composer dump-autoload" to apply the changes.');
-            } else {
-                $this->components->info('To manually configure modular autoloading, add the following to your composer.json:');
-
-                $manualJson = [
-                    'extra' => [
-                        'merge-plugin' => [
-                            'include' => array_values(array_unique(array_merge($include, [$relativeModulesPath]))),
-                        ],
-                    ],
-                ];
-
-                $this->line("\n".(string) json_encode($manualJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)."\n");
-                $this->components->warn('Modular autoloading might not work until you add this configuration.');
-            }
-        } else {
-            $this->components->info('Composer merge settings already configured.');
-        }
-
-        if (isset($composer['autoload']['psr-4']['Modules\\'])) {
-            if ($this->confirm('Legacy "Modules\\" PSR-4 autoloading found. Remove it?', true)) {
-                unset($composer['autoload']['psr-4']['Modules\\']);
-                File::put($composerJsonPath, (string) json_encode($composer, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
-                $this->info('Removed legacy "Modules\\" PSR-4 autoloading.');
+                $this->components->info("Configured composer.json to include {$relativeMergePath}");
             }
         }
+
+        $this->warn('Please run "composer dump-autoload" to apply autoloading changes.');
     }
 
     /**
@@ -215,6 +208,57 @@ class ModularInstallCommand extends Command
             $content = (string) File::get($stubPath);
             File::put($path, $content);
             $this->components->info('Created vite.modular.js loader.');
+        }
+    }
+
+    /**
+     * Create the vite.base.js helper file.
+     */
+    protected function createViteBaseHelper(): void
+    {
+        $path = base_path('vite.base.js');
+
+        if (File::exists($path)) {
+            return;
+        }
+
+        $stubPath = __DIR__.'/../../resources/stubs/vite.base.js.stub';
+
+        if (File::exists($stubPath)) {
+            $content = (string) File::get($stubPath);
+            File::put($path, $content);
+            $this->components->info('Created vite.base.js helper.');
+        }
+    }
+
+    /**
+     * Configure NPM Workspaces in package.json.
+     */
+    protected function configureNpmWorkspaces(): void
+    {
+        $packageJsonPath = base_path('package.json');
+
+        if (! File::exists($packageJsonPath)) {
+            return;
+        }
+
+        /** @var array<string, mixed> $packageJson */
+        $packageJson = json_decode((string) File::get($packageJsonPath), true);
+        
+        $modulesPath = Str::after(config('modular.paths.modules', base_path('modules')), base_path().'/').'/*';
+        $workspaces = (array) ($packageJson['workspaces'] ?? []);
+
+        if (! in_array($modulesPath, $workspaces)) {
+            $this->components->warn('NPM Workspaces are recommended for per-module assets.');
+
+            if ($this->confirm('Would you like to automatically configure NPM Workspaces?', true)) {
+                $workspaces[] = $modulesPath;
+                $packageJson['workspaces'] = array_values(array_unique($workspaces));
+
+                File::put($packageJsonPath, (string) json_encode($packageJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+                $this->components->info("Configured package.json workspaces to include {$modulesPath}");
+                $this->warn('Please run "npm install" to initialize workspaces.');
+            }
         }
     }
 }

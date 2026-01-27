@@ -26,7 +26,33 @@ export const modularLoader = {
                     return;
                 }
 
-                // Check for resources/assets or resources/js|css
+                // New logic: Check for module-specific vite.config.js
+                const moduleViteConfig = path.join(itemPath, 'vite.config.js');
+                if (fs.existsSync(moduleViteConfig)) {
+                    try {
+                        // We use a simple regex to extract inputs from the stubbed config
+                        // as we can't easily 'import' ESM in a sync context here reliably
+                        const configContent = fs.readFileSync(moduleViteConfig, 'utf8');
+                        const inputMatch = configContent.match(/inputs:\s*\[([\s\S]*?)\]/);
+                        
+                        if (inputMatch && inputMatch[1]) {
+                            const foundInputs = inputMatch[1]
+                                .split(',')
+                                .map(line => line.trim().replace(/['"]/g, ''))
+                                .filter(line => line.length > 0);
+
+                            foundInputs.forEach(input => {
+                                inputs.push(path.relative(process.cwd(), path.join(itemPath, input)));
+                            });
+                            
+                            return; // Found explicit config, skip fallback
+                        }
+                    } catch (e) {
+                        // Fallback to manual discovery on error
+                    }
+                }
+
+                // Fallback: Check for resources/assets or resources/js|css
                 const searchPaths = [
                     path.join(itemPath, 'resources/assets'),
                     path.join(itemPath, 'resources/js'),

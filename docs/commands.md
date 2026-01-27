@@ -126,6 +126,42 @@ Generate an IDE helper file (`_ide_helper_modular.php`) for better autocompletio
 php artisan modular:ide-helper
 ```
 
+### `modular:list`
+
+List all modules and their discovered resources (Policies, Events, etc.).
+
+```bash
+php artisan modular:list
+```
+
+**Options:**
+- `--only`: Filter by type (`modules`, `policies`, or `events`).
+
+### `modular:sync`
+
+Sync module-level dependencies into the root `composer.json` for performance.
+
+```bash
+php artisan modular:sync
+```
+
+**Options:**
+- `--dry-run`: Show what would be synced without making changes.
+
+### `modular:npm`
+
+Run npm commands in a specific module's workspace from the root.
+
+```bash
+php artisan modular:npm Blog install
+php artisan modular:npm Blog build
+```
+
+**What it does:**
+- Automatically targets the `@modules/blog` workspace.
+- Runs 'npm install' at the root level if the command is `install` (global sync).
+- Simplifies managing isolated module dependencies.
+
 ## Standard Laravel Commands
 
 All standard Laravel `make:` commands work with the `--module` flag:

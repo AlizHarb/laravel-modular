@@ -20,8 +20,10 @@ php artisan modular:install
 
 ### What does this command do?
 1. **Publishes Config**: Creates `config/modular.php`.
-2. **Setup Composer Merging**: Installs `wikimedia/composer-merge-plugin` and links your root `composer.json` to our package's Zero Config setup. This allows each module to have its own `composer.json` file.
-3. **Vite Detection**: Checks your `vite.config.js` and warns if you need to add module paths (though we usually handle this automatically in the backend).
+2. **Setup Optimized PSR-4**: Adds `"Modules\\": "modules/"` to your root `composer.json` for high-performance class loading.
+3. **Setup Composer Merging**: Configures `wikimedia/composer-merge-plugin` to discover module-specific `composer.json` files and dependencies.
+4. **NPM Workspaces**: Adds `"workspaces": ["modules/*"]` to your root `package.json` for isolated module asset management.
+5. **Vite Detection**: Configures `vite.modular.js` and `vite.base.js` to enable seamless modular asset discovery and hot reloading.
 
 ## 3. Verify Installation
 

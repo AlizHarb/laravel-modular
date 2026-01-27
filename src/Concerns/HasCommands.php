@@ -38,6 +38,9 @@ use AlizHarb\Modular\Commands\ModularLinkCommand;
 use AlizHarb\Modular\Commands\ModularMakeModuleCommand;
 use AlizHarb\Modular\Commands\ModularMigrateCommand;
 use AlizHarb\Modular\Commands\ModularSeedCommand;
+use AlizHarb\Modular\Commands\ModularSyncCommand;
+use AlizHarb\Modular\Commands\ModularListCommand;
+use AlizHarb\Modular\Commands\ModularNpmCommand;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Console\Factories\FactoryMakeCommand;
 use Illuminate\Database\Console\Migrations\MigrateMakeCommand;
@@ -90,6 +93,9 @@ trait HasCommands
             \AlizHarb\Modular\Commands\ModularTestCommand::class,
             \AlizHarb\Modular\Commands\ModularDebugCommand::class,
             \AlizHarb\Modular\Commands\ModularIdeHelperCommand::class,
+            ModularSyncCommand::class,
+            ModularListCommand::class,
+            ModularNpmCommand::class,
         ]);
 
         if (config('modular.discovery.commands', true)) {
