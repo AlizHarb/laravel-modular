@@ -29,6 +29,19 @@ class ModuleDisableCommand extends Command
     public function handle(ModuleRegistry $registry): int
     {
         $moduleName = (string) $this->argument('module');
+        $module = $registry->getModule($moduleName);
+
+        if (! $module) {
+            $this->components->error("Module [{$moduleName}] not found.");
+
+            return self::FAILURE;
+        }
+
+        if ($module['disableable'] === false) {
+            $this->error("Module [{$moduleName}] cannot be disabled.");
+
+            return self::FAILURE;
+        }
 
         $activator = $registry->getActivator();
         $activator->setStatus($moduleName, false);

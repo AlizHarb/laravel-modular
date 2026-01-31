@@ -1,187 +1,228 @@
 # Artisan Commands
 
-Laravel Modular provides custom Artisan commands for managing your modules efficiently.
 
-## Module Management
 
-### `modular:install`
+## Generator Commands (The Daily Drivers)
 
-Installs and configures Laravel Modular in your application.
+These commands create files inside your modules. They support **all** standard Laravel flags (like `-m`, `-c`, `-r`).
+
+### `make:module`
+Creates a brand new module with the full directory structure.
 
 ```bash
-php artisan modular:install
+php artisan make:module Shop
 ```
 
-**What it does:**
-- Publishes configuration files
-- Configures `composer-merge-plugin`
-- Optionally publishes stubs for customization
-- Checks Vite configuration
+**What it does:- **Modules Folder**: `modules/` (configurable)
+- **Namespace**: `Modules\` (configurable)`, `composer.json`, `package.json`, `vite.config.js`.
+3. Creates `ShopServiceProvider`.
+4. Updates `composer.json` autoloading (PSR-4).
 
-### `modular:migrate`
+---
 
-Run migrations for all modules or a specific module.
+### `make:model`
+Creates an Eloquent model.
 
 ```bash
-# Migrate all modules
+php artisan make:model Product --module=Shop
+```
+
+**Options:**
+- `-m`, `--migration`: Create a migration file.
+- `-c`, `--controller`: Create a controller.
+- `-r`, `--resource`: Controller should be a Resource Controller.
+- `-f`, `--factory`: Create a factory.
+- `-s`, `--seed`: Create a seeder.
+- `--policy`: Create a policy.
+- `-a`, `--all`: Do EVERYTHING (migration, factory, seeder, policy, controller, resource).
+
+**Example:**
+```bash
+# Create Model + Migration + Factory + Resource Controller
+php artisan make:model Order --module=Shop -mfr
+```
+
+---
+
+### `make:controller`
+Creates a controller class.
+
+```bash
+php artisan make:controller ProductController --module=Shop
+```
+
+**Options:**
+- `--resource`: Generate a resource controller (index, create, store...).
+- `--api`: Generate an API controller (no create/edit methods).
+- `--model=Product`: Bind the controller to a model.
+
+---
+
+### `make:migration`
+Creates a database migration.
+
+```bash
+php artisan make:migration create_orders_table --module=Shop
+```
+
+**File Location:**Creates `modules/Shop/database/migrations/xxxx_xx_xx_create_orders_table.php`.
+
+---
+
+### Other Generators
+All of these work exactly as you expect, just add `--module=Name`.
+
+- `make:command` (Console Command)
+- `make:component` (Blade Component)
+- `make:event`
+- `make:factory`
+- `make:job`
+- `make:listener`
+- `make:mail`
+- `make:middleware`
+- `make:notification`
+- `make:observer`
+- `make:policy`
+- `make:provider`
+- `make:request` (Form Request)
+- `make:resource` (API Resource)
+- `make:rule`
+- `make:seeder`
+- `make:test`
+
+---
+
+## Management Commands (`modular:*`)
+
+commands to manage the lifecycle and state of your modules.
+
+### `modular:list`
+Displays a table of all modules, their status (Enabled/Disabled), and path.
+
+```bash
+php artisan modular:list
+```
+
+### `modular:migrate`
+Migrate the database.
+
+```bash
+# Migrate ALL enabled modules + core app
 php artisan modular:migrate
 
-# Migrate specific module
-php artisan modular:migrate Blog
+# Migrate ONLY the Shop module
+php artisan modular:migrate Shop
 
-# Fresh migration with seeding
-php artisan modular:migrate Blog --fresh --seed
+# Rollback
+php artisan modular:migrate:rollback Shop
 ```
 
 ### `modular:seed`
-
-Seed the database for all modules or a specific module.
+Run database seeders.
 
 ```bash
-# Seed all modules
-php artisan modular:seed
+# Seed 'Shop' module (looks for Shop\Database\Seeders\ShopSeeder)
+php artisan modular:seed Shop
+```
 
-# Seed specific module
-php artisan modular:seed Blog
+### `modular:test`
+Run PHPUnit/Pest tests.
+
+```bash
+# Run tests for Shop
+php artisan modular:test Shop
+```
+
+### `modular:npm`
+Run NPM commands inside a module's directory.
+
+```bash
+# Install a package for Shop
+php artisan modular:npm Shop install chart.js
+
+# Build assets for Shop
+php artisan modular:npm Shop run build
+```
+
+### `modular:sync`
+This command is critical for large teams. It scans all `packages/modular/*/composer.json` files and merges their requirements into the root `composer.json` (into a `requires` section managed by the package).
+
+*Note: This usually happens automatically during `make:module`, but run this if you manually edit dependencies.*
+
+```bash
+php artisan modular:sync
+```
+
+### `modular:check`
+Checks for circular dependencies between modules.
+
+```bash
+php artisan modular:check
 ```
 
 ### `modular:link`
-
-Create symbolic links from module assets to the public directory.
+Symlinks module public assets to the `public/` directory.
 
 ```bash
-# Link all module assets
 php artisan modular:link
 ```
 
 ### `modular:cache`
-
-Create a cache file for faster module discovery. Highly recommended for production.
+Create a cache file for faster module discovery. Checks for config, views, translations, and migrations.
 
 ```bash
 php artisan modular:cache
 ```
 
 ### `modular:clear`
-
-Remove the modular cache file.
+Remove the modular discovery cache file.
 
 ```bash
 php artisan modular:clear
 ```
 
-### `module:enable`
-
-Enable a specific module dynamically.
-
-```bash
-php artisan module:enable Blog
-```
-
-### `module:disable`
-
-Disable a specific module dynamically.
-
-```bash
-php artisan module:disable Blog
-```
-
-### `modular:check`
-
-Check for circular dependencies between modules.
-
-```bash
-php artisan modular:check
-```
-
 ### `modular:debug`
-
-Visualize module status, providers, paths, and middleware configuration.
-
-```bash
-php artisan modular:debug [Module]
-```
-
-### `modular:publish`
-
-Publish module assets, views, config, and translations.
+Debug module configuration, providers, and middleware.
 
 ```bash
-php artisan modular:publish Blog
-```
+# Debug all modules summary
+php artisan modular:debug
 
-### `modular:test`
-
-Run tests for a specific module.
-
-```bash
-php artisan modular:test Blog
+# Debug a specific module (deep dive)
+php artisan modular:debug Shop
 ```
 
 ### `modular:ide-helper`
-
-Generate an IDE helper file (`_ide_helper_modular.php`) for better autocompletion.
+Generate a helper file (`_ide_helper_modular.php`) to help IDEs auto-complete module names.
 
 ```bash
 php artisan modular:ide-helper
 ```
 
-### `modular:list`
-
-List all modules and their discovered resources (Policies, Events, etc.).
-
-```bash
-php artisan modular:list
-```
-
-**Options:**
-- `--only`: Filter by type (`modules`, `policies`, or `events`).
-
-### `modular:sync`
-
-Sync module-level dependencies into the root `composer.json` for performance.
+### `modular:publish`
+Publish configuration and stub files for customization.
 
 ```bash
-php artisan modular:sync
+php artisan modular:publish
 ```
+- Select `config` to publish `config/modular.php`.
+- Select `stubs` to publish generator stubs.
 
-**Options:**
-- `--dry-run`: Show what would be synced without making changes.
-
-### `modular:npm`
-
-Run npm commands in a specific module's workspace from the root.
+### `module:enable` / `module:disable`
+Enable or disable a module instantly.
 
 ```bash
-php artisan modular:npm Blog install
-php artisan modular:npm Blog build
+php artisan module:disable Shop
 ```
+*Disabled modules are not loaded, their routes are 404, and their services are not booted.*
 
-**What it does:**
-- Automatically targets the `@modules/blog` workspace.
-- Runs 'npm install' at the root level if the command is `install` (global sync).
-- Simplifies managing isolated module dependencies.
-
-## Standard Laravel Commands
-
-All standard Laravel `make:` commands work with the `--module` flag:
+### `module:uninstall`
+Uninstall (delete) a module.
 
 ```bash
-# Create a model
-php artisan make:model Product --module=Shop -mcf
+# Uninstall the Shop module
+php artisan module:uninstall Shop
 
-# Create a controller
-php artisan make:controller ProductController --module=Shop --resource
-
-# Create a request
-php artisan make:request StoreProductRequest --module=Shop
-
-# Create a test
-php artisan make:test ProductTest --module=Shop
+# Force uninstall in production
+php artisan module:uninstall Shop --force
 ```
-
-## Tips
-
-- Use `--help` on any command to see all available options
-- The `--module` flag is case-sensitive and should match your module name exactly
-- You can chain flags just like standard Laravel commands

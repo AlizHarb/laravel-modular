@@ -250,6 +250,30 @@ vendor/bin/pest
 
 ---
 
+## 🌍 Ecosystem
+
+Extend your modular architecture with our official ecosystem packages:
+
+| Package | Description |
+| :--- | :--- |
+| **[Laravel Themer](https://github.com/alizharb/laravel-themer)** | For advanced theme management support |
+| **[Modular Livewire](https://github.com/alizharb/laravel-modular-livewire)** | Provides automatic Livewire component discovery and registration within modules. |
+| **[Modular JS](https://github.com/alizharb/laravel-modular-js)** | Enables JS discovery within modular structures and provides zero-config autoloading for modules. |
+| **[Modular Filament](https://github.com/alizharb/laravel-modular-filament)** | Enables Filament v5 admin panel integration with automatic discovery in modules. |
+| **[Filament Themer Launcher](https://github.com/alizharb/filament-themer-luncher)** | Provides a comprehensive Filament v5 interface for managing and switching themes. |
+| **[Filament Modular Launcher](https://github.com/alizharb/filament-modular-luncher)** | A powerful Filament v5 manager for listing, toggling, and backing up system modules. |
+| **[Laravel Hooks](https://github.com/alizharb/laravel-hooks)** | Adds a universal extensibility and plugin system for Laravel applications. |
+
+### ⚡ JavaScript & Vite Integration
+
+We provide first-class support for modern frontend tooling:
+
+- **NPM Workspaces**: Run `php artisan modular:npm` to configure workspaces, allowing each module to manage its own `package.json` dependencies efficiently.
+- **Vite Integration**: Use the `modular_vite('ModuleName')` helper to load module-specific assets with full Hot Module Replacement (HMR) support.
+- **Asset Publishing**: Easily publish public assets to the main application with `php artisan modular:link`.
+
+---
+
 ## 💖 Sponsors
 
 We would like to extend our thanks to the following sponsors for funding Laravel Modular development. If you are interested in becoming a sponsor, please visit the [Laravel Modular GitHub Sponsors page](https://github.com/sponsors/alizharb).

@@ -61,10 +61,13 @@
         }
     },
     "suggest": {
-        "alizharb/laravel-hooks": "For modular hook system support",
-        "alizharb/laravel-modular-filament": "For Filament admin panel integration in modules",
-        "alizharb/laravel-modular-livewire": "For Livewire component support in modules",
-        "alizharb/laravel-themer": "For advanced theme management support"
+        "alizharb/laravel-themer": "For advanced theme management support",
+        "alizharb/laravel-modular-livewire": "Provides automatic Livewire component discovery and registration within modules.",
+        "alizharb/laravel-modular-js": "Enables JS discovery within modular structures and provides zero-config autoloading for modules.",
+        "alizharb/laravel-modular-filament": "Enables Filament v5 admin panel integration with automatic discovery in modules.",
+        "alizharb/filament-themer-luncher": "Provides a comprehensive Filament v5 interface for managing and switching themes.",
+        "alizharb/filament-modular-luncher": "A powerful Filament v5 manager for listing, toggling, and backing up system modules.",
+        "alizharb/laravel-hooks": "Adds a universal extensibility and plugin system for Laravel applications."
     },
     "config": {
         "allow-plugins": {

@@ -88,6 +88,7 @@ trait HasCommands
             \AlizHarb\Modular\Commands\ModularClearCommand::class,
             \AlizHarb\Modular\Commands\ModuleEnableCommand::class,
             \AlizHarb\Modular\Commands\ModuleDisableCommand::class,
+            \AlizHarb\Modular\Commands\ModuleUninstallCommand::class,
             \AlizHarb\Modular\Commands\ModularCheckCommand::class,
             \AlizHarb\Modular\Commands\ModularPublishCommand::class,
             \AlizHarb\Modular\Commands\ModularTestCommand::class,

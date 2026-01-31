@@ -2,6 +2,23 @@
 
 All notable changes to `laravel-modular` will be documented in this file.
 
+## v1.1.3 - 2026-01-31
+
+### Added
+
+- **New Command**: Introduced `module:uninstall {module}` command to safely remove modules. This command checks for the `removable` flag and clears the module cache upon completion.
+- **Module Metadata**: Added `removable` and `disableable` fields to `module.json` schema and registry.
+  - `removable`: Controls whether the module can be uninstalled via CLI (default: `true`).
+  - `disableable`: Controls whether the module can be disabled via CLI (default: `true`).
+- **Documentation**: Enhanced documentation site.
+
+### Changed
+
+- **Command Security**: The `module:disable` command now respects the `disableable` metadata flag, preventing critical modules from being disabled accidentally.
+- **Stubs & Schema**: Updated `module.json` stub and schema to include and validate the new metadata fields.
+
+---
+
 ## v1.1.2 - 2026-01-27
 
 ### Added

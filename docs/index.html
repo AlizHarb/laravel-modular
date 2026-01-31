@@ -1,447 +1,1647 @@
-<!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Laravel Modular Documentation</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/php.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/json.min.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    <style>
-        * { font-family: 'Inter', system-ui, sans-serif; }
-        code, pre { font-family: 'JetBrains Mono', monospace !important; }
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Laravel Modular - The Professional Modules Package</title>
+        <meta name="description" content="The standard for building modular Laravel applications. Strict DDD, automated discovery, and production-ready tools.">
+        <meta name="keywords" content="laravel, modular, modules, ddd, architecture, package, php">
+        <meta property="og:title" content="Laravel Modular">
+        <meta property="og:description" content="Build scalable, modular Laravel applications with ease.">
+        <meta property="og:type" content="website">
+
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
+            rel="stylesheet"
+        />
+
+        <script
+            defer
+            src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"
+        ></script>
+        <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2"></script>
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/tokyo-night-dark.min.css"
+        />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+            :root {
+        /* Light Mode - Clean, crisp, high contrast */
+        --bg-1: oklch(99% 0.002 240);       /* Pure visual white */
+        --bg-2: oklch(97% 0.005 240);       /* Very subtle cool gray */
+        --bg-3: oklch(94% 0.01 240);        /* Structural gray */
+        --text-1: oklch(25% 0.02 260);      /* Deep charcoal, almost black */
+        --text-2: oklch(45% 0.02 260);      /* Readable secondary text */
+        --text-3: oklch(65% 0.02 260);      /* Muted meta text */
+        --border: oklch(92% 0.01 240);      /* Subtle structural border */
         
-        :root {
-            --red: oklch(0.61 0.24 25);
-            --red-dark: oklch(0.55 0.24 25);
-        }
-        
-        .dark {
-            --red: oklch(0.68 0.24 25);
-        }
-        
-        /* Custom scrollbar */
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-        .dark ::-webkit-scrollbar-thumb { background: #475569; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-        
-        /* Code blocks */
-        pre {
-            position: relative;
-            margin: 2rem 0 !important;
-            border-radius: 12px !important;
-            background: #0d1117 !important;
-            padding: 0 !important;
-            overflow: hidden !important;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.05) !important;
-        }
-        
-        .dark pre {
-            background: #0d1117 !important;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05) !important;
-        }
-        
-        pre code {
-            display: block !important;
-            padding: 1.5rem !important;
-            color: #e6edf3 !important;
-            font-size: 0.875rem !important;
-            line-height: 1.7 !important;
-            background: transparent !important;
-            overflow-x: auto !important;
-        }
-        
-        pre code::-webkit-scrollbar {
-            height: 8px;
-        }
-        
-        pre code::-webkit-scrollbar-track {
-            background: rgba(255,255,255,0.05);
-        }
-        
-        pre code::-webkit-scrollbar-thumb {
-            background: rgba(255,255,255,0.2);
-            border-radius: 4px;
-        }
-        
-        pre code::-webkit-scrollbar-thumb:hover {
-            background: rgba(255,255,255,0.3);
-        }
-        
-        :not(pre) > code {
-            background: #f1f5f9 !important;
-            color: #e11d48 !important;
-            padding: 0.2rem 0.4rem !important;
-            border-radius: 0.25rem !important;
-            font-size: 0.875em !important;
-        }
-        
-        .dark :not(pre) > code {
-            background: #1e293b !important;
-            color: #fb7185 !important;
-        }
-    </style>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        red: { DEFAULT: '#ff2d20', dark: '#e02414', light: '#ff5545' }
-                    },
-                    typography: (theme) => ({
-                        DEFAULT: {
-                            css: {
-                                maxWidth: 'none',
-                                h1: {
-                                    fontSize: '4.5rem',
-                                    fontWeight: '900',
-                                    lineHeight: '1.2',
-                                    marginBottom: '2rem',
-                                    marginTop: '0',
-                                    paddingBottom: '2rem',
-                                    borderBottom: `4px solid ${theme('colors.red.DEFAULT')}`,
-                                    color: theme('colors.slate.950'),
-                                },
-                                h2: {
-                                    fontSize: '3rem',
-                                    fontWeight: '900',
-                                    lineHeight: '1.3',
-                                    marginTop: '6rem',
-                                    marginBottom: '2.5rem',
-                                    paddingBottom: '1.25rem',
-                                    borderBottom: `2px solid ${theme('colors.slate.300')}`,
-                                    color: theme('colors.slate.950'),
-                                },
-                                h3: {
-                                    fontSize: '1.875rem',
-                                    fontWeight: '800',
-                                    lineHeight: '1.4',
-                                    marginTop: '4rem',
-                                    marginBottom: '1.75rem',
-                                    color: theme('colors.slate.900'),
-                                },
-                                p: {
-                                    fontSize: '1.25rem',
-                                    lineHeight: '1.8',
-                                    marginTop: '1.75rem',
-                                    marginBottom: '1.75rem',
-                                    color: theme('colors.slate.800'),
-                                },
-                                li: {
-                                    fontSize: '1.25rem',
-                                    lineHeight: '1.8',
-                                    color: theme('colors.slate.800'),
-                                },
-                                strong: {
-                                    fontWeight: '900',
-                                    color: theme('colors.slate.950'),
-                                },
-                                a: {
-                                    color: theme('colors.red.DEFAULT'),
-                                    fontWeight: '700',
-                                    textDecoration: 'none',
-                                    '&:hover': {
-                                        textDecoration: 'underline',
-                                    },
-                                },
-                            },
-                        },
-                    }),
+        /* Brand Accent (Laravel Red-ish) */
+        --accent: oklch(58% 0.22 25);       /* Vibrant, accessible red-orange */
+        --accent-light: oklch(68% 0.18 25); /* Softer highlight */
+        --accent-fade: oklch(58% 0.22 25 / 0.1); 
+      }
+            [x-cloak] {
+                display: none !important;
+            }
+      .dark {
+        /* Dark Mode - Deep, rich, low eye strain */
+        --bg-1: oklch(18% 0.02 260);        /* Deep blue-gray background */
+        --bg-2: oklch(21% 0.02 260);        /* Slightly elevated surface */
+        --bg-3: oklch(25% 0.03 260);        /* UI element background */
+        --text-1: oklch(92% 0.01 240);      /* High contrast primary text */
+        --text-2: oklch(75% 0.02 240);      /* Comfortable secondary text */
+        --text-3: oklch(55% 0.03 240);      /* Receded meta text */
+        --border: oklch(30% 0.03 260);      /* Seamless dark borders */
+
+        /* Adjusted Accent for Dark Mode */
+        --accent: oklch(65% 0.20 25);       /* Slightly lighter to pop against dark */
+        --accent-light: oklch(72% 0.16 25);
+        --accent-fade: oklch(65% 0.20 25 / 0.15);
+      }
+      
+      /* Custom Scrollbars */
+      ::-webkit-scrollbar { width: 6px; height: 6px; }
+      ::-webkit-scrollbar-track { background: transparent; }
+      ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+      ::-webkit-scrollbar-thumb:hover { background: var(--text-3); }
+      
+            body {
+                font-family: "Inter", sans-serif;
+                background: var(--bg-1);
+                color: var(--text-1);
+                line-height: 1.6;
+                overflow-x: hidden;
+                transition:
+                    background 0.3s,
+                    color 0.3s;
+            }
+      .header {
+        position: fixed; top: 0; left: 0; right: 0; height: 60px;
+        background: var(--bg-1); /* Solid but will rely on border */
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--border); z-index: 1000;
+        background: color-mix(in oklch, var(--bg-1), transparent 10%);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .header-hidden {
+          transform: translateY(-100%);
+      }
+      .scrolling-progress-bar {
+          position: fixed;
+          top: 0; left: 0;
+          height: 3px;
+          background: var(--accent);
+          z-index: 2000;
+          transition: width 0.1s;
+      }
+      .dark .header { background: color-mix(in oklch, var(--bg-1), transparent 10%); }
+            .header-inner {
+                max-width: 1400px;
+                margin: 0 auto;
+                height: 100%;
+                padding: 0 1.5rem;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 1.5rem;
+            }
+            .logo {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                text-decoration: none;
+                color: var(--text-1);
+            }
+            .logo-icon {
+                width: 32px;
+                height: 32px;
+                background: linear-gradient(
+                    135deg,
+                    var(--accent),
+                    var(--accent-light)
+                );
+                border-radius: 8px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: white;
+                font-weight: 800;
+                font-size: 14px;
+            }
+            .logo-text {
+                font-size: 18px;
+                font-weight: 700;
+            }
+            .search-btn {
+                flex: 1;
+                max-width: 400px;
+                padding: 8px 12px;
+                background: var(--bg-2);
+                border: 1px solid var(--border);
+                border-radius: 8px;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                cursor: pointer;
+                transition: all 0.2s;
+            }
+            .search-btn:hover {
+                border-color: var(--accent);
+            }
+            .search-btn-text {
+                flex: 1;
+                color: var(--text-3);
+                font-size: 14px;
+            }
+            .sponsor-btn {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                padding: 6px 12px;
+                background: linear-gradient(135deg, #ec4899, #db2777); 
+                color: white;
+                font-weight: 600;
+                font-size: 13px;
+                border-radius: 6px;
+                text-decoration: none;
+                transition: transform 0.2s, box-shadow 0.2s;
+                border: 1px solid rgba(255,255,255,0.1);
+            }
+            .sponsor-btn:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 4px 12px rgba(236, 72, 153, 0.3);
+            }
+            .heart-icon {
+                fill: rgba(255,255,255,0.2);
+            }
+            .kbd {
+                padding: 3px 6px;
+                background: var(--bg-3);
+                border: 1px solid var(--border);
+                border-radius: 4px;
+                font-size: 11px;
+                font-weight: 600;
+                color: var(--text-2);
+                font-family: "JetBrains Mono", monospace;
+            }
+            .search-modal {
+                position: fixed;
+                inset: 0;
+                z-index: 2000;
+                display: flex;
+                align-items: flex-start;
+                justify-content: center;
+                padding: 10vh 1rem 1rem;
+                background: rgba(0, 0, 0, 0.5);
+                backdrop-filter: blur(4px);
+            }
+            .search-container {
+                width: 100%;
+                max-width: 600px;
+                background: var(--bg-1);
+                border: 1px solid var(--border);
+                border-radius: 12px;
+                box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+                overflow: hidden;
+            }
+            .search-input-wrapper {
+                padding: 1rem;
+                border-bottom: 1px solid var(--border);
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+            .search-input {
+                flex: 1;
+                background: transparent;
+                border: none;
+                font-size: 16px;
+                color: var(--text-1);
+                outline: none;
+            }
+            .search-results {
+                max-height: 400px;
+                overflow-y: auto;
+            }
+            .search-section {
+                padding: 8px 16px;
+                font-size: 11px;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                color: var(--text-3);
+                background: var(--bg-2);
+            }
+            .search-result {
+                padding: 12px 16px;
+                cursor: pointer;
+                border-bottom: 1px solid var(--border);
+                transition: background 0.2s;
+            }
+            .search-result:hover {
+                background: var(--bg-2);
+            }
+            .result-title {
+                font-weight: 600;
+                color: var(--text-1);
+                font-size: 14px;
+                margin-bottom: 4px;
+            }
+            .result-snippet {
+                font-size: 13px;
+                color: var(--text-2);
+            }
+            .highlight { background: var(--accent-fade); color: var(--accent); font-weight: 600; }
+            .search-empty {
+                padding: 3rem 1rem;
+                text-align: center;
+                color: var(--text-3);
+            }
+            .icon-btn {
+                width: 36px;
+                height: 36px;
+                border-radius: 8px;
+                background: var(--bg-2);
+                border: 1px solid var(--border);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                transition: all 0.2s;
+                color: var(--text-2);
+            }
+            .icon-btn:hover {
+                background: var(--bg-3);
+                color: var(--accent);
+            }
+            .layout {
+                display: flex;
+                flex-direction: row; /* Explicitly set row */
+                align-items: flex-start; /* Ensure top alignment */
+                min-height: 100vh;
+                max-width: 1400px;
+                margin: 0 auto;
+                padding-top: 60px;
+            }
+            .sidebar {
+                width: 280px;
+                flex-shrink: 0;
+                position: sticky;
+                top: 60px;
+                height: calc(100vh - 60px);
+                overflow-y: auto;
+                border-right: 1px solid var(--border);
+                padding: 2rem 1.5rem;
+                background: var(--bg-1);
+            }
+            .content-wrapper {
+                flex: 1;
+                min-width: 0;
+                position: relative;
+            }
+            .content {
+                max-width: 896px;
+                margin: 0 auto;
+                padding: 3rem 2.5rem;
+            }
+            .nav-section {
+                margin-bottom: 2rem;
+            }
+            .nav-title {
+                font-size: 11px;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                color: var(--text-3);
+                margin-bottom: 12px;
+                padding-left: 12px; /* Align with links */
+            }
+            .nav-link {
+                display: block;
+                padding: 6px 12px;
+                color: var(--text-2);
+                text-decoration: none;
+                font-size: 14px;
+                font-weight: 500;
+                border-left: 2px solid transparent; /* Highlight marker */
+                transition: all 0.2s;
+                margin-bottom: 2px;
+                border-radius: 0 4px 4px 0;
+            }
+            .nav-link:hover {
+                color: var(--text-1);
+                background: var(--bg-2);
+            }
+            .nav-link.active {
+                color: var(--accent);
+                background: color-mix(in srgb, var(--accent) 5%, transparent);
+                border-left-color: var(--accent);
+                font-weight: 600;
+            }
+
+            /* Desktop */
+            @media (min-width: 1024px) {
+                .layout {
+                    flex-direction: row;
+                    align-items: flex-start;
+                }
+                .sidebar {
+                    width: 260px;
+                    border-right: 1px solid var(--border);
+                    border-bottom: none;
+                    height: calc(100vh - 65px);
+                    position: sticky;
+                    top: 65px;
+                    overflow-y: auto;
+                    display: block; /* Always visible on desktop */
+                }
+                .content-wrapper {
+                    flex: 1;
+                    /* display: flex;  <-- This was potentially causing issues if not handled right */
+                    min-width: 0;
+                }
+                .content {
+                    max-width: 900px; /* Limit content width for readability */
+                    margin: 0 auto;
+                    padding: 3rem 4rem;
                 }
             }
-        }
-    </script>
-</head>
-<body class="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 transition-colors">
-    
-    <!-- Top Nav -->
-    <nav class="sticky top-0 z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800">
-        <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16">
-                <div class="flex items-center gap-8">
-                    <button onclick="toggleMobileSidebar()" class="lg:hidden -ml-2 p-2 text-slate-500 hover:text-slate-900 dark:hover:text-white">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
-                    </button>
-                    <a href="#" class="flex items-center gap-2 font-bold text-xl">
-                        <span class="text-red">Laravel</span>
-                        <span class="text-slate-900 dark:text-white">Modular</span>
-                    </a>
+            
+            .jump-menu {
+                width: 220px;
+                flex-shrink: 0;
+                padding: 2rem 1rem;
+                display: none; /* Hidden by default, explicit split needed for 3-col layout if desired, but current design is 2-col + inner float typically */
+            }
+            @media (min-width: 1024px) {
+               .jump-menu { display: block; }
+               .content-wrapper { display: flex; }
+               .content { flex: 1; max-width: calc(100% - 220px); }
+            }
+            
+            .jump-menu-inner {
+                position: sticky;
+                top: 80px;
+                max-height: calc(100vh - 160px);
+                overflow-y: auto;
+            }
+            .jump-title {
+                font-size: 12px;
+                font-weight: 700;
+                color: var(--text-3);
+                margin-bottom: 12px;
+                text-transform: uppercase;
+            }
+            .jump-list {
+                list-style: none;
+            }
+            .jump-link {
+                display: block;
+                padding: 6px 0 6px 12px;
+                color: var(--text-2);
+                text-decoration: none;
+                font-size: 13px;
+                border-left: 2px solid transparent;
+                transition: all 0.2s;
+            }
+            .jump-link:hover {
+                color: var(--accent);
+                border-left-color: var(--accent);
+            }
+            .jump-link.active {
+                color: var(--accent);
+                border-left-color: var(--accent);
+                font-weight: 600;
+            }
+            .prose h1 {
+                font-size: 2.25rem;
+                font-weight: 800;
+                line-height: 1.2;
+                margin-bottom: 1.5rem;
+            }
+            .prose h2 {
+                font-size: 1.75rem;
+                font-weight: 700;
+                margin-top: 2.5rem;
+                margin-bottom: 1rem;
+                padding-bottom: 0.5rem;
+                border-bottom: 1px solid var(--border);
+            }
+            .prose p {
+                margin: 1rem 0;
+                color: var(--text-2);
+            }
+            .prose a {
+                color: var(--accent);
+                text-decoration: none;
+                font-weight: 500;
+            }
+            .prose code {
+                background: var(--bg-3);
+                padding: 2px 6px;
+                border-radius: 4px;
+                font-family: "JetBrains Mono", monospace;
+                color: var(--accent);
+                font-size: 0.9em;
+            }
+            .prose pre { background: #1a1b26; color: #a9b1d6; padding: 1.25rem; border-radius: 8px; overflow-x: auto; margin: 1.25rem 0; position: relative; }
+            .prose pre code {
+                background: transparent;
+                padding: 0;
+                color: inherit;
+                font-size: 14px;
+            }
+
+            /* Premium Elements */
+            .prose blockquote {
+                border-left: 4px solid var(--accent);
+                background: var(--bg-2);
+                padding: 1rem 1.5rem;
+                margin: 1.5rem 0;
+                border-radius: 0 8px 8px 0;
+                color: var(--text-2);
+                font-style: normal; /* Modern style, not italic */
+            }
+            .prose table {
+                width: 100%;
+                border-collapse: separate;
+                border-spacing: 0;
+                margin: 2rem 0;
+                font-size: 0.95rem;
+                border: 1px solid var(--border);
+                border-radius: 8px;
+                overflow: hidden;
+            }
+            .prose th {
+                text-align: left;
+                padding: 0.85rem 1.25rem;
+                background: var(--bg-2);
+                border-bottom: 1px solid var(--border);
+                font-weight: 600;
+                color: var(--text-1);
+            }
+            .prose td {
+                padding: 0.85rem 1.25rem;
+                border-bottom: 1px solid var(--border);
+                color: var(--text-2);
+            }
+            .prose tr:last-child td {
+                border-bottom: none;
+            }
+            .prose ul,
+            .prose ol {
+                margin: 1.25rem 0;
+                padding-left: 1.5rem;
+            }
+            .prose li {
+                margin: 0.5rem 0;
+                color: var(--text-2);
+            }
+            .prose strong {
+                color: var(--text-1);
+                font-weight: 600;
+            }
+            .prose hr {
+                border: 0;
+                border-top: 1px solid var(--border);
+                margin: 3rem 0;
+            }
+
+            /* Code Block Copy Button */
+            .prose pre { position: relative; }
+            .copy-btn {
+                position: absolute;
+                top: 8px;
+                right: 8px;
+                padding: 4px 8px;
+                font-size: 12px;
+                background: rgba(255,255,255,0.1);
+                border: 1px solid rgba(255,255,255,0.2);
+                border-radius: 4px;
+                color: #a9b1d6;
+                cursor: pointer;
+                opacity: 0;
+                transition: opacity 0.2s, background 0.2s;
+            }
+            .prose pre:hover .copy-btn { opacity: 1; }
+            .copy-btn:hover { background: rgba(255,255,255,0.2); color: white; }
+
+            /* Admonitions (GitHub Style) */
+            .admonition {
+                margin: 1.5rem 0;
+                padding: 1rem 1rem 1rem 3rem; /* Left padding for icon */
+                border-left: 4px solid;
+                border-radius: 0 8px 8px 0;
+                background: var(--bg-2);
+                position: relative;
+            }
+            .admonition::before {
+                content: '';
+                position: absolute;
+                top: 1.1rem;
+                left: 1rem;
+                width: 16px;
+                height: 16px;
+                background-size: contain;
+                background-repeat: no-repeat;
+            }
+            .admonition-title {
+                font-weight: 700;
+                margin-bottom: 0.5rem;
+                display: block;
+            }
+            .admonition p { margin: 0.5rem 0 0; }
+            .admonition p:first-child { margin-top: 0; }
+            
+            /* Admonition Types */
+            .adm-note { border-color: #3b82f6; background: color-mix(in srgb, #3b82f6 5%, var(--bg-1)); }
+            .adm-note::before { background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%233b82f6"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>'); }
+            
+            .adm-tip { border-color: #22c55e; background: color-mix(in srgb, #22c55e 5%, var(--bg-1)); }
+            .adm-tip::before { background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%2322c55e"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>'); }
+            
+            .adm-warning { border-color: #eab308; background: color-mix(in srgb, #eab308 5%, var(--bg-1)); }
+            .adm-warning::before { background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23eab308"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>'); }
+            
+            .adm-important { border-color: #a855f7; background: color-mix(in srgb, #a855f7 5%, var(--bg-1)); }
+            .adm-important::before { background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23a855f7"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>'); }
+
+            .adm-caution { border-color: #ef4444; background: color-mix(in srgb, #ef4444 5%, var(--bg-1)); }
+            .adm-caution::before { background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23ef4444"><path d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z"/></svg>'); }
+
+            .next-steps {
+                margin: 3rem 0;
+                display: flex;
+                justify-content: space-between;
+                gap: 1rem;
+            }
+            .next-btn {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                padding: 10px 16px;
+                background: var(--bg-1);
+                border: 1px solid var(--border);
+                border-radius: 8px;
+                color: var(--text-2);
+                text-decoration: none;
+                font-size: 14px;
+                font-weight: 500;
+                transition: all 0.2s;
+                max-width: 48%;
+            }
+            .next-btn:hover {
+                border-color: var(--accent);
+                color: var(--text-1);
+                transform: translateY(-1px);
+            }
+            .next-btn-content {
+                display: flex;
+                flex-direction: column;
+                gap: 2px;
+            }
+            .next-btn-label {
+                font-size: 11px;
+                text-transform: uppercase;
+                color: var(--text-3);
+                font-weight: 700;
+            }
+            .next-btn-title {
+                color: var(--text-1);
+                font-weight: 600;
+            }
+            .next-btn:hover .next-btn-title { color: var(--accent); }
+            .footer {
+                margin-top: 0;
+                padding: 3rem 2.5rem 2rem;
+                background: linear-gradient(135deg, var(--bg-2), var(--bg-3));
+                border-top: 1px solid var(--border);
+            }
+            .footer-grid {
+                display: grid;
+                grid-template-columns: 2fr 1fr 1fr;
+                gap: 2rem;
+                margin-bottom: 2rem;
+            }
+            .footer-section h4 {
+                font-weight: 700;
+                margin-bottom: 1rem;
+                color: var(--text-1);
+            }
+            .footer-link {
+                display: block;
+                font-size: 14px;
+                color: var(--text-2);
+                text-decoration: none;
+                margin-bottom: 0.5rem;
+            }
+            .footer-link:hover {
+                color: var(--accent);
+            }
+            .footer-bottom {
+                padding-top: 2rem;
+                border-top: 1px solid var(--border);
+                display: flex;
+                justify-content: space-between;
+                color: var(--text-3);
+                font-size: 13px;
+                align-items: center;
+            }
+            .footer {
+                margin-top: 0;
+                padding: 3rem 2rem;
+                background: var(--bg-2);
+                border-top: 1px solid var(--border);
+            }
+            .footer-content {
+                max-width: 1400px;
+                margin: 0 auto;
+                display: flex;
+                flex-direction: column;
+                gap: 2rem;
+            }
+            .footer-top {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: 2rem;
+            }
+            .footer-brand {
+                display: flex;
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            .footer-brand span { 
+                font-size: 1.1rem; 
+                font-weight: 700; 
+                color: var(--text-1); 
+                letter-spacing: -0.02em;
+            }
+            .footer-brand small { 
+                color: var(--text-2); 
+                font-size: 0.9rem; 
+            }
+            .footer-links {
+                display: flex;
+                align-items: center;
+                gap: 2rem;
+            }
+            .footer-link {
+                color: var(--text-2);
+                text-decoration: none;
+                font-size: 0.95rem;
+                font-weight: 500;
+                transition: color 0.2s;
+            }
+            .footer-link:hover {
+                color: var(--accent);
+            }
+            .footer-bottom {
+                padding-top: 2rem;
+                border-top: 1px solid var(--border);
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: 1rem;
+                color: var(--text-3);
+                font-size: 0.85rem;
+            }
+
+            @media (max-width: 640px) {
+                .footer-top { flex-direction: column; align-items: flex-start; gap: 1.5rem; }
+                .footer-links { flex-direction: column; align-items: flex-start; gap: 1rem; }
+                .footer-bottom { flex-direction: column; align-items: flex-start; }
+                .sponsor-btn { width: 100%; justify-content: center; }
+            }
+            @media (max-width: 1024px) {
+                .layout { flex-direction: column; }
+                .sidebar {
+                    position: fixed;
+                    left: -280px;
+                    top: 60px;
+                    bottom: 0;
+                    width: 280px;
+                    height: calc(100vh - 60px); 
+                    z-index: 999;
+                    background: var(--bg-1);
+                    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                    transform: translateX(0);
+                    border-right: 1px solid var(--border);
+                    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.1);
+                }
+                .sidebar.open {
+                    transform: translateX(280px); /* Slide in to 0 */
+                }
+                .content-wrapper { display: block; width: 100%; overflow-x: hidden; } /* Prevent horizontal scroll */
+                .content { padding: 1.5rem; max-width: 100%; }
+                .jump-menu { display: none; }
+                .mobile-menu-btn { display: flex !important; margin-right: 0.5rem; }
+                
+                .sidebar-overlay {
+                    position: fixed;
+                    inset: 0;
+                    top: 60px; /* Below header */
+                    background: rgba(0, 0, 0, 0.5);
+                    backdrop-filter: blur(2px);
+                    z-index: 998;
+                }
+            }
+            @media (min-width: 1024px) {
+                .sidebar-overlay { display: none !important; }
+            }
+            @media (max-width: 640px) {
+                .header-inner { padding: 0 1rem; gap: 0; /* Removing fixed gap to let justify-between work */ }
+                .search-btn { max-width: 40px; padding: 0; justify-content: center; background: transparent; border: none; margin-left: auto; margin-right: 0.5rem; }
+                .search-btn-text, .kbd { display: none; }
+                .desktop-actions { display: none !important; }
+                .logo-text { font-size: 16px; margin-left: 8px; }
+                .prose h1 { font-size: 1.75rem; }
+                .prose h2 { font-size: 1.5rem; }
+                .footer-grid { grid-template-columns: 1fr; gap: 2rem; }
+                
+                /* Sidebar Mobile Polish */
+                .mobile-actions { display: block; }
+            }
+            @media (min-width: 641px) {
+                .mobile-actions { display: none; }
+            }
+            /* Breadcrumbs */
+            .breadcrumbs {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                margin-bottom: 2rem;
+                font-size: 13px;
+                color: var(--text-3);
+            }
+            .breadcrumb-item {
+                color: var(--text-2);
+                text-decoration: none;
+            }
+            .breadcrumb-item:hover { color: var(--accent); }
+            .breadcrumb-separator { opacity: 0.5; }
+            .breadcrumb-current { color: var(--text-1); font-weight: 600; }
+
+            /* Mac-style Terminal Window */
+            .code-window {
+                background: #1a1b26;
+                border-radius: 8px;
+                margin: 1.5rem 0;
+                overflow: hidden;
+                border: 1px solid var(--border);
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            }
+            .window-header {
+                background: #15161e;
+                padding: 0.75rem 1rem; /* Taller header */
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                border-bottom: 1px solid #2f334d;
+            }
+            .window-dot {
+                width: 10px;
+                height: 10px;
+                border-radius: 50%;
+            }
+            .dot-red { background: #ff5f56; }
+            .dot-yellow { background: #ffbd2e; }
+            .dot-green { background: #27c93f; }
+            .window-title {
+                margin-left: auto;
+                font-family: "JetBrains Mono", monospace;
+                font-size: 12px;
+                color: #565f89;
+            }
+            /* Override default pre style to fit window */
+            .prose .code-window pre {
+                margin: 0;
+                border-radius: 0;
+                border: none;
+                background: transparent;
+            }
+            
+            /* Floating Scroll Top */
+            .scroll-top {
+                position: fixed;
+                bottom: 2rem;
+                right: 2rem;
+                width: 44px;
+                height: 44px;
+                background: var(--accent);
+                color: white;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 0 4px 12px var(--accent-fade);
+                cursor: pointer;
+                border: none;
+                opacity: 0;
+                transform: translateY(20px);
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                z-index: 50;
+            }
+            .scroll-top.visible {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            .scroll-top:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 8px 16px var(--accent-fade);
+            }
+
+            @media (max-width: 640px) {
+                .hero-title { font-size: 2.5rem; }
+                .hero-section { padding: 2rem 0; }
+                .breadcrumbs { display: none; } /* Check if user wants this hidden or stacked */
+                .scroll-top { bottom: 6rem; right: 1.5rem; } /* Above mobile nav bar if exists, or standard */
+            }
+        </style>
+    </head>
+    <body x-data="docsApp()" x-init="init()" :class="{ 'dark': darkMode }">
+        <div class="scrolling-progress-bar" :style="`width: ${scrollProgress}%`"></div>
+        <header class="header" :class="{ 'header-hidden': !headerVisible }">
+            <div class="header-inner">
+                <button
+                    @click="sidebarOpen = !sidebarOpen"
+                    class="icon-btn mobile-menu-btn"
+                    style="display: none"
+                >
+                    <svg
+                        width="18"
+                        height="18"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M4 6h16M4 12h16M4 18h16"
+                        />
+                    </svg>
+                </button>
+                <a href="./" class="logo">
+                     <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M16 2L6 8V24L16 30L26 24V8L16 2Z" fill="url(#logo_grad)" stroke="var(--border)" stroke-width="1"/>
+                        <path d="M16 6L22 9.5V22.5L16 26L10 22.5V9.5L16 6Z" fill="var(--bg-1)" fill-opacity="0.3"/>
+                        <path d="M16 11L19 12.75V19.25L16 21L13 19.25V12.75L16 11Z" fill="white"/>
+                        <defs>
+                            <linearGradient id="logo_grad" x1="6" y1="2" x2="26" y2="30" gradientUnits="userSpaceOnUse">
+                                <stop stop-color="#F97316"/>
+                                <stop offset="1" stop-color="#DB2777"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                    <span class="logo-text">Laravel Modular</span>
+                </a>
+                <div class="search-btn" @click="searchOpen = true">
+                    <svg
+                        width="18"
+                        height="18"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                        />
+                    </svg>
+                    <span class="search-btn-text">Search...</span>
+                    <span class="kbd">⌘K</span>
                 </div>
-                <div class="flex items-center gap-4">
-                    <button onclick="toggleTheme()" class="p-2 text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors">
-                        <svg id="themeIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
-                    </button>
-                    <a href="https://github.com/alizharb/laravel-modular" class="hidden sm:inline-flex items-center gap-2 px-4 py-2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-lg hover:bg-slate-800 dark:hover:bg-slate-100 font-medium transition-colors">
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
-                        GitHub
+                <!-- Desktop Actions -->
+                <div class="desktop-actions" style="display: flex; gap: 0.75rem">
+                    <a
+                        href="https://github.com/alizharb/laravel-modular"
+                        target="_blank"
+                        style="
+                            color: var(--text-2);
+                            text-decoration: none;
+                            font-weight: 500;
+                            font-size: 14px;
+                            display: flex;
+                            align-items: center;
+                        "
+                        >GitHub</a
+                    >
+                    <a
+                        href="https://github.com/sponsors/alizharb"
+                        target="_blank"
+                        class="sponsor-btn"
+                        >
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="heart-icon"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                        Sponsor
                     </a>
+                    <button @click="darkMode = !darkMode" class="icon-btn">
+                        <svg
+                            x-show="!darkMode"
+                            width="18"
+                            height="18"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
+                            />
+                        </svg>
+                        <svg
+                            x-show="darkMode"
+                            width="18"
+                            height="18"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
+                            />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <div
+            x-show="searchOpen"
+            x-cloak
+            class="search-modal"
+            @click.self="searchOpen = false"
+            @keydown.escape.window="searchOpen = false"
+        >
+            <div class="search-container">
+                <div class="search-input-wrapper">
+                    <input
+                        type="text"
+                        class="search-input"
+                        placeholder="Search documentation..."
+                        x-model="searchQuery"
+                        @input="search()"
+                        x-ref="searchInput"
+                    />
+                </div>
+                <div class="search-results">
+                    <template
+                        x-for="(section, sectionName) in groupedResults"
+                        :key="sectionName"
+                    >
+                        <div>
+                            <div
+                                class="search-section"
+                                x-text="sectionName"
+                            ></div>
+                            <template
+                                x-for="result in section"
+                                :key="result.id"
+                            >
+                                <div
+                                    class="search-result"
+                                    @click="goToResult(result)"
+                                >
+                                    <div
+                                        class="result-title"
+                                        x-text="result.title"
+                                    ></div>
+                                    <div
+                                        class="result-snippet"
+                                        x-html="result.snippet"
+                                    ></div>
+                                </div>
+                            </template>
+                        </div>
+                    </template>
                 </div>
             </div>
         </div>
-    </nav>
 
-    <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="lg:flex lg:gap-8">
-            
-            <!-- Sidebar -->
-            <aside id="sidebar" class="fixed inset-0 z-40 lg:static lg:z-0 lg:block lg:w-64 lg:shrink-0 -translate-x-full lg:translate-x-0 transition-transform">
-                <div class="h-full lg:sticky lg:top-16 lg:h-[calc(100vh-4rem)] overflow-y-auto bg-white dark:bg-slate-900 lg:bg-transparent border-r border-slate-200 dark:border-slate-800 lg:border-0 py-8 lg:py-12">
+        <div 
+            x-show="sidebarOpen" 
+            x-transition.opacity 
+            @click="sidebarOpen = false"
+            class="sidebar-overlay"
+        ></div>
+
+        <div class="layout">
+            <aside class="sidebar" :class="{ 'open': sidebarOpen }">
+                <div class="nav-section">
+                    <div class="nav-title">
+                        <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-right: 4px; display: inline-block; vertical-align: -1px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                        Getting Started
+                    </div>
+                    <a
+                        href="#"
+                        @click.prevent="loadPage('installation')"
+                        class="nav-link"
+                        :class="{ 'active': currentPage === 'installation' }"
+                        >Installation</a
+                    >
+                    <a
+                        href="#"
+                        @click.prevent="loadPage('guide')"
+                        class="nav-link"
+                        :class="{ 'active': currentPage === 'guide' }"
+                        >Guide</a
+                    >
+                </div>
+                <div class="nav-section">
+                    <div class="nav-title">
+                        <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-right: 4px; display: inline-block; vertical-align: -1px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                        Core
+                    </div>
+                    <a
+                        href="#"
+                        @click.prevent="loadPage('architecture')"
+                        class="nav-link"
+                        :class="{ 'active': currentPage === 'architecture' }"
+                        >Architecture</a
+                    >
+                    <a
+                        href="#"
+                        @click.prevent="loadPage('configuration')"
+                        class="nav-link"
+                        :class="{ 'active': currentPage === 'configuration' }"
+                        >Configuration</a
+                    >
+                </div>
+                <div class="nav-section">
+                    <div class="nav-title">
+                        <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-right: 4px; display: inline-block; vertical-align: -1px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+                        Usage
+                    </div>
+                    <a
+                        href="#"
+                        @click.prevent="loadPage('commands')"
+                        class="nav-link"
+                        :class="{ 'active': currentPage === 'commands' }"
+                        >Commands</a
+                    >
+                    <a
+                        href="#"
+                        @click.prevent="loadPage('helpers')"
+                        class="nav-link"
+                        :class="{ 'active': currentPage === 'helpers' }"
+                        >Helpers</a
+                    >
+                    <a
+                        href="#"
+                        @click.prevent="loadPage('frontend')"
+                        class="nav-link"
+                        :class="{ 'active': currentPage === 'frontend' }"
+                        >Frontend</a
+                    >
+                </div>
+                <div class="nav-section">
+                    <div class="nav-title">
+                        <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-right: 4px; display: inline-block; vertical-align: -1px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+                        Advanced
+                    </div>
+                    <a
+                        href="#"
+                        @click.prevent="loadPage('advanced')"
+                        class="nav-link"
+                        :class="{ 'active': currentPage === 'advanced' }"
+                        >Advanced</a
+                    >
+                    <a
+                        href="#"
+                        @click.prevent="loadPage('testing')"
+                        class="nav-link"
+                        :class="{ 'active': currentPage === 'testing' }"
+                        >Testing</a
+                    >
+                    <a
+                        href="#"
+                        @click.prevent="loadPage('deployment')"
+                        class="nav-link"
+                        :class="{ 'active': currentPage === 'deployment' }"
+                        >Deployment</a
+                    >
+                </div>
+                <div class="nav-section">
+                    <div class="nav-title">
+                        <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-right: 4px; display: inline-block; vertical-align: -1px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                        Community
+                    </div>
+                    <a
+                        href="#"
+                        @click.prevent="loadPage('ecosystem')"
+                        class="nav-link"
+                        :class="{ 'active': currentPage === 'ecosystem' }"
+                        >Ecosystem</a>
+                </div>
+                
+                <!-- Mobile Actions (Sidebar) -->
+                <div class="mobile-actions">
+                    <div style="height: 1px; background: var(--border); margin: 1.5rem 0;"></div>
+                    <div class="nav-title">Settings & Support</div>
                     
+                    <button @click="darkMode = !darkMode" class="nav-link" style="width: 100%; border: none; background: transparent; cursor: pointer;">
+                         <div class="nav-icon" style="display: flex; align-items: center; justify-content: center;">
+                             <svg x-show="!darkMode" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+                             <svg x-show="darkMode" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                         </div>
+                         <span x-text="darkMode ? 'Light Mode' : 'Dark Mode'"></span>
+                    </button>
 
+                    <a href="https://github.com/alizharb/laravel-modular" target="_blank" class="nav-link">
+                        <div class="nav-icon"><svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg></div>
+                        <span>GitHub</span>
+                    </a>
 
-                    <!-- Nav -->
-                    <nav id="navigation" class="px-4 lg:px-0 space-y-8"></nav>
+                    <a href="https://github.com/sponsors/alizharb" target="_blank" class="sponsor-btn" style="justify-content: center; margin-top: 8px;">
+                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="heart-icon"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                        Sponsor
+                    </a>
                 </div>
             </aside>
 
-            <!-- Overlay for mobile -->
-            <div id="sidebarOverlay" onclick="toggleMobileSidebar()" class="hidden fixed inset-0 bg-slate-900/50 z-30 lg:hidden"></div>
+            <div class="content-wrapper">
+                <main class="content">
+                    
+                    <!-- Breadcrumbs -->
+                    <nav class="breadcrumbs" x-show="currentPage !== 'guide'" x-cloak>
+                        <a href="#" @click.prevent="loadPage('guide')" class="breadcrumb-item">Home</a>
+                        <span class="breadcrumb-separator">/</span>
+                        <span class="breadcrumb-current" x-text="pageTitles[currentPage] || 'Page'"></span>
+                    </nav>
 
-            <!-- Content -->
-            <main class="flex-1 lg:max-w-4xl py-12 pb-0">
-                <div id="content" class="prose prose-slate dark:prose-invert max-w-none pb-16
-                    prose-headings:scroll-mt-20 prose-headings:font-black prose-headings:tracking-tight
-                    prose-h1:text-7xl prose-h1:leading-tight prose-h1:mb-8 prose-h1:mt-0 prose-h1:pb-8 prose-h1:border-b-4 prose-h1:border-red prose-h1:text-slate-950 dark:prose-h1:text-white
-                    prose-h2:text-5xl prose-h2:leading-tight prose-h2:mt-24 prose-h2:mb-10 prose-h2:pb-5 prose-h2:border-b-2 prose-h2:border-slate-300 dark:prose-h2:border-slate-700 prose-h2:flex prose-h2:items-center prose-h2:gap-4 prose-h2:text-slate-950 dark:prose-h2:text-white
-                    prose-h3:text-3xl prose-h3:leading-snug prose-h3:mt-16 prose-h3:mb-7 prose-h3:font-extrabold prose-h3:flex prose-h3:items-center prose-h3:gap-3 prose-h3:text-slate-900 dark:prose-h3:text-white
-                    prose-h4:text-2xl prose-h4:mt-12 prose-h4:mb-6 prose-h4:font-bold prose-h4:text-slate-900 dark:prose-h4:text-white
-                    prose-p:text-slate-800 dark:prose-p:text-slate-200 prose-p:leading-loose prose-p:text-xl prose-p:my-7 prose-p:font-normal
-                    prose-a:text-red prose-a:font-bold prose-a:no-underline hover:prose-a:underline prose-a:decoration-2 prose-a:underline-offset-4 prose-a:transition-all
-                    prose-strong:text-slate-950 dark:prose-strong:text-white prose-strong:font-black
-                    prose-code:text-pink-600 dark:prose-code:text-pink-400 prose-code:font-bold prose-code:text-base
-                    prose-ul:my-10 prose-ul:space-y-5 prose-li:my-0 prose-li:text-slate-800 dark:prose-li:text-slate-200 prose-li:text-xl prose-li:leading-loose
-                    prose-ol:my-10 prose-ol:space-y-5
-                    prose-blockquote:border-l-4 prose-blockquote:border-red prose-blockquote:pl-8 prose-blockquote:py-6 prose-blockquote:my-12 prose-blockquote:not-italic prose-blockquote:text-slate-800 dark:prose-blockquote:text-slate-200 prose-blockquote:bg-red/10 dark:prose-blockquote:bg-red/20 prose-blockquote:rounded-r-xl prose-blockquote:text-xl prose-blockquote:font-medium
-                    prose-table:my-12 prose-th:text-left prose-th:font-black prose-th:p-5 prose-th:bg-slate-100 dark:prose-th:bg-slate-800 prose-th:text-base prose-td:p-5 prose-td:border prose-td:border-slate-200 dark:prose-td:border-slate-700 prose-td:text-base
-                    prose-hr:my-20 prose-hr:border-slate-300 dark:prose-hr:border-slate-700
-                    prose-img:rounded-2xl prose-img:shadow-2xl prose-img:my-12
-                ">
-                    <div class="flex items-center justify-center h-64 text-slate-400">
-                        <div class="animate-pulse">Loading...</div>
+                    <article id="content" class="prose">
+                        <div
+                            style="
+                                text-align: center;
+                                padding: 3rem;
+                                color: var(--text-3);
+                            "
+                        >
+                            Loading...
+                        </div>
+                    </article>
+                    <div id="next-steps"></div>
+                </main>
+                <aside class="jump-menu">
+                    <div class="jump-menu-inner">
+                        <div class="jump-title">On This Page</div>
+                        <ul class="jump-list" id="jump-list"></ul>
                     </div>
-                </div>
-            </main>
-
-            <!-- TOC -->
-            <aside class="hidden lg:block w-64 shrink-0">
-                <div class="sticky top-16 py-12 pl-8">
-                    <h3 class="text-sm font-semibold text-slate-900 dark:text-white mb-4">On This Page</h3>
-                    <nav id="toc" class="text-sm space-y-2 border-l border-slate-200 dark:border-slate-800 pl-4"></nav>
-                </div>
-            </aside>
-
-        </div>
-    </div>
-
-    <!-- Footer -->
-    <footer class="bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 mt-20">
-        <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-                <div class="md:col-span-2">
-                    <div class="flex items-center gap-2 font-bold text-xl mb-4">
-                        <span class="text-red">Laravel</span>
-                        <span class="text-slate-900 dark:text-white">Modular</span>
-                    </div>
-                    <p class="text-slate-600 dark:text-slate-400 mb-4 max-w-md">A professional, framework-agnostic modular architecture for Laravel 11+. Build scalable applications with zero configuration.</p>
-                    <div class="flex gap-4">
-                        <a href="https://github.com/alizharb/laravel-modular" class="text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors">
-                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
-                        </a>
-                        <a href="https://packagist.org/packages/alizharb/laravel-modular" class="text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors">
-                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm-1.5 17.5L4 12l1.5-1.5L11 16l7.5-7.5L20 10l-9.5 9.5z"/></svg>
-                        </a>
-                    </div>
-                </div>
-                <div>
-                    <h3 class="font-bold text-slate-900 dark:text-white mb-4">Documentation</h3>
-                    <ul class="space-y-2 text-sm">
-                        <li><a href="#README.md" onclick="loadPage('README.md', event)" class="text-slate-600 hover:text-red dark:text-slate-400 dark:hover:text-red transition-colors">Introduction</a></li>
-                        <li><a href="#installation.md" onclick="loadPage('installation.md', event)" class="text-slate-600 hover:text-red dark:text-slate-400 dark:hover:text-red transition-colors">Installation</a></li>
-                        <li><a href="#modules.md" onclick="loadPage('modules.md', event)" class="text-slate-600 hover:text-red dark:text-slate-400 dark:hover:text-red transition-colors">Creating Modules</a></li>
-                        <li><a href="#commands.md" onclick="loadPage('commands.md', event)" class="text-slate-600 hover:text-red dark:text-slate-400 dark:hover:text-red transition-colors">Commands</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h3 class="font-bold text-slate-900 dark:text-white mb-4">resources</h3>
-                    <ul class="space-y-2 text-sm">
-                        <li><a href="https://github.com/alizharb/laravel-modular" class="text-slate-600 hover:text-red dark:text-slate-400 dark:hover:text-red transition-colors">GitHub</a></li>
-                        <li><a href="https://github.com/alizharb/laravel-modular/issues" class="text-slate-600 hover:text-red dark:text-slate-400 dark:hover:text-red transition-colors">Issues</a></li>
-                        <li><a href="https://github.com/sponsors/alizharb" class="text-slate-600 hover:text-red dark:text-slate-400 dark:hover:text-red transition-colors">Sponsor</a></li>
-                        <li><a href="mailto:harbzali@gmail.com" class="text-slate-600 hover:text-red dark:text-slate-400 dark:hover:text-red transition-colors">Contact</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="border-t border-slate-200 dark:border-slate-800 mt-8 pt-8 text-center text-sm text-slate-600 dark:text-slate-400">
-                <p>Made with ❤️ by <a href="https://github.com/alizharb" class="text-red font-semibold hover:underline">Ali Harb</a></p>
-                <p class="mt-2">Licensed under the MIT License</p>
+                </aside>
             </div>
         </div>
-    </footer>
 
-    <script>
-        const docs = {
-            'Getting Started': [
-                { title: 'Introduction', file: 'README.md', icon: '🚀' },
-                { title: 'Installation', file: 'installation.md', icon: '📦' },
-                { title: 'Directory Structure', file: 'structure.md', icon: '📁' }
-            ],
-            'Core Concepts': [
-                { title: 'Creating Modules', file: 'modules.md', icon: '🏗️' },
-                { title: 'Artisan Commands', file: 'commands.md', icon: '⚡' },
-                { title: 'Configuration', file: 'configuration.md', icon: '⚙️' }
-            ],
-            'Features': [
-                { title: 'Resource Discovery', file: 'resources.md', icon: '🔍' },
-                { title: 'Assets & Vite', file: 'assets.md', icon: '🎨' },
-                { title: 'Database', file: 'database.md', icon: '💾' },
-                { title: 'Helpers', file: 'helpers.md', icon: '🛠️' }
-            ],
-            'Advanced': [
-                { title: 'TALL Stack', file: 'tall-stack.md', icon: '⚡' },
-                { title: 'Custom Stubs', file: 'stubs.md', icon: '📝' },
-                { title: 'Testing', file: 'testing.md', icon: '✅' }
-            ]
-        };
+        <!-- Scroll Top Button -->
+        <button 
+            class="scroll-top"
+            :class="{ 'visible': scrollProgress > 10 || (document.documentElement.scrollTop > 500) }"
+            @click="window.scrollTo({ top: 0, behavior: 'smooth' })"
+        >
+            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
+        </button>
 
-        let allContent = [];
-        let currentTheme = localStorage.getItem('theme') || 'light';
-
-        if (currentTheme === 'dark') document.documentElement.classList.add('dark');
-        updateThemeIcon();
-        buildNavigation();
-        loadDefaultPage();
-
-        function buildNavigation() {
-            const nav = document.getElementById('navigation');
-            let html = '';
-            for (const [section, items] of Object.entries(docs)) {
-                html += `<div><h3 class="text-xs font-semibold text-slate-900 dark:text-white uppercase tracking-wider mb-3">${section}</h3><ul class="space-y-2 border-l border-slate-200 dark:border-slate-800">`;
-                items.forEach(item => {
-                    html += `<li><a href="#${item.file}" onclick="loadPage('${item.file}', event)" class="nav-link flex items-center gap-2 pl-4 -ml-px border-l-2 border-transparent text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:border-slate-400 dark:hover:border-slate-500 transition-colors py-1" data-file="${item.file}"><span class="text-lg">${item.icon}</span><span>${item.title}</span></a></li>`;
-                });
-                html += `</ul></div>`;
-            }
-            nav.innerHTML = html;
-        }
-
-        async function loadPage(file, event) {
-            if (event) event.preventDefault();
-            
-            console.log('Loading file:', file);
-            
-            try {
-                const response = await fetch(file);
-                console.log('Response status:', response.status, response.statusText);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
-                const markdown = await response.text();
-                console.log('Markdown loaded, length:', markdown.length);
-                
-                const html = marked.parse(markdown);
-                document.getElementById('content').innerHTML = html;
-                
-                // Syntax highlighting
-                document.querySelectorAll('pre code').forEach((block) => {
-                    hljs.highlightElement(block);
-                });
-                
-                // Add icons to headings
-                document.querySelectorAll('#content h2').forEach((heading) => {
-                    const icon = document.createElement('span');
-                    icon.className = 'text-red text-3xl';
-                    icon.textContent = '📚';
-                    heading.insertBefore(icon, heading.firstChild);
-                });
-                
-                document.querySelectorAll('#content h3').forEach((heading) => {
-                    const icon = document.createElement('span');
-                    icon.className = 'text-red text-xl';
-                    icon.textContent = '▸';
-                    heading.insertBefore(icon, heading.firstChild);
-                });
-
-                // Update active nav
-                document.querySelectorAll('.nav-link').forEach(link => {
-                    link.classList.remove('border-red', 'text-red', 'font-medium');
-                });
-                const active = document.querySelector(`[data-file="${file}"]`);
-                if (active) active.classList.add('border-red', 'text-red', 'font-medium');
-
-                // Build TOC
-                buildTOC();
-
-                // Close mobile sidebar
-                if (window.innerWidth < 1024) toggleMobileSidebar();
-
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            } catch (error) {
-                console.error('Error loading page:', error);
-                document.getElementById('content').innerHTML = `
-                    <div class="text-center py-12">
-                        <h1 class="text-2xl font-bold text-red mb-2">Error Loading Page</h1>
-                        <p class="text-slate-600 dark:text-slate-400">Could not load ${file}</p>
-                        <p class="text-sm text-slate-500 mt-2">Error: ${error.message}</p>
-                        <p class="text-sm text-slate-500">Check browser console for details</p>
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-grid">
+                    <div class="footer-section">
+                        <h4>Laravel Modular</h4>
+                        <p style="color: var(--text-2); font-size: 0.95rem; line-height: 1.6; max-width: 300px;">
+                            The professional choice for building scalable, maintainable, and testable large-scale Laravel applications. 
+                            Strict DDD principles, automated discovery, and enterprise-grade tools out of the box.
+                        </p>
                     </div>
-                `;
-            }
-        }
+                    <div class="footer-section">
+                        <h4>Ecosystem</h4>
+                        <a href="https://github.com/alizharb/laravel-themer" class="footer-link">Laravel Themer</a>
+                        <a href="https://github.com/alizharb/laravel-modular-livewire" class="footer-link">Modular Livewire</a>
+                        <a href="https://github.com/alizharb/laravel-modular" class="footer-link">Laravel Modular</a>
+                    </div>
+                    <div class="footer-section">
+                        <h4>Resources</h4>
+                        <a href="#" @click.prevent="loadPage('guide')" class="footer-link">Documentation</a>
+                        <a href="https://github.com/alizharb/laravel-modular" class="footer-link">Source Code</a>
+                        <a href="https://github.com/sponsors/alizharb" class="footer-link">Sponsor Project</a>
+                    </div>
+                </div>
+                <div class="footer-bottom">
+                    <div>
+                        &copy; 2026 Ali Harb. Open sourced under MIT.
+                    </div>
+                    <div style="display: flex; gap: 1.5rem;">
+                         <a href="https://github.com/alizharb" target="_blank" style="color: var(--text-3); text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-3)'">GitHub Profile</a>
+                         <a href="https://twitter.com/alizharb" target="_blank" style="color: var(--text-3); text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-3)'">Twitter</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
 
-        function buildTOC() {
-            const headings = document.querySelectorAll('#content h2, #content h3');
-            const toc = document.getElementById('toc');
-            if (headings.length === 0) {
-                toc.innerHTML = '';
-                return;
+        <script>
+            function docsApp() {
+                return {
+                    darkMode: localStorage.getItem("darkMode") === "true",
+                    currentPage: "guide",
+                    sidebarOpen: false,
+                    searchOpen: false,
+                    searchQuery: "",
+                    headerVisible: true,
+                    lastScrollY: 0,
+                    scrollProgress: 0,
+                    searchResults: [],
+                    groupedResults: {},
+                    allContent: {},
+                    pageTitles: {
+                        installation: "Installation",
+                        guide: "Documentation Guide",
+                        architecture: "Modular Architecture",
+                        configuration: "Configuration",
+                        commands: "Artisan Commands",
+                        helpers: "Helpers & Utilities",
+                        frontend: "Frontend Integration",
+                        advanced: "Advanced Features",
+                        testing: "Testing Modules",
+                        deployment: "Deployment Guide",
+                        ecosystem: "Ecosystem & Packages",
+                    },
+                    init() {
+                        this.$watch("darkMode", (val) =>
+                            localStorage.setItem("darkMode", val),
+                        );
+                        this.$watch("searchOpen", (val) => {
+                            if (val)
+                                setTimeout(
+                                    () => this.$refs.searchInput.focus(),
+                                    100,
+                                );
+                            else {
+                                this.searchQuery = "";
+                                this.searchResults = [];
+                            }
+                        });
+                        this.preloadPages();
+                        this.loadPage("guide");
+                        
+                        // Scroll Handler (Throttled)
+                        let ticking = false;
+                        window.addEventListener("scroll", () => {
+                            if (!ticking) {
+                                window.requestAnimationFrame(() => {
+                                    this.updateActiveJump();
+                                    const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+                                    const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+                                    this.scrollProgress = (winScroll / height) * 100;
+                                    // Force update for Alpine binding if needed, though simple var binding works
+                                    ticking = false;
+                                });
+                                ticking = true;
+                            }
+                        });
+
+                        document.addEventListener("keydown", (e) => {
+                            if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+                                e.preventDefault();
+                                this.searchOpen = true;
+                            }
+                        });
+                    },
+                    async preloadPages() {
+                        const pages = Object.keys(this.pageTitles);
+                        for (const p of pages) {
+                            try {
+                                const res = await fetch(`${p}.md`);
+                                if (res.ok)
+                                    this.allContent[p] = await res.text();
+                            } catch (e) {}
+                        }
+                    },
+                    async loadPage(page) {
+                        this.currentPage = page;
+                        this.sidebarOpen = false;
+                        window.scrollTo({ top: 0, behavior: "smooth" });
+                        const contentEl = document.getElementById("content");
+                        contentEl.innerHTML =
+                            '<div style="text-align: center; padding: 3rem; color: var(--text-3);">Loading...</div>';
+
+                        try {
+                            let markdown = this.allContent[page];
+                            if (!markdown) {
+                                const res = await fetch(`${page}.md`);
+                                if (!res.ok) throw new Error("Not Found");
+                                markdown = await res.text();
+                                this.allContent[page] = markdown;
+                            }
+                            contentEl.innerHTML = marked.parse(markdown);
+                            // Code Block Decoration (Terminal Style)
+                            // Code Block Decoration (Terminal Style)
+                            contentEl.querySelectorAll("pre").forEach((pre) => {
+                                // Create wrapper
+                                const wrapper = document.createElement("div");
+                                wrapper.className = "code-window";
+                                
+                                // Safely get language
+                                const codeEl = pre.querySelector('code');
+                                const lang = codeEl && codeEl.className ? codeEl.className.replace('language-', '') : 'terminal';
+                                
+                                // Create header
+                                const header = document.createElement("div");
+                                header.className = "window-header";
+                                header.innerHTML = `
+                                    <div class="window-dot dot-red"></div>
+                                    <div class="window-dot dot-yellow"></div>
+                                    <div class="window-dot dot-green"></div>
+                                    <div class="window-title">${lang}</div>
+                                `;
+                                
+                                // Insert wrapper
+                                pre.parentNode.insertBefore(wrapper, pre);
+                                wrapper.appendChild(header);
+                                wrapper.appendChild(pre);
+                                
+                                // Syntax Highlighting if code element exists
+                                if(codeEl) hljs.highlightElement(codeEl);
+                            });
+
+                            this.generateJumpMenu();
+                            this.generateNextSteps();
+                            this.processAdmonitions(contentEl);
+                            this.injectCopyButtons(contentEl);
+                            
+                            // Adjust title for Hero
+                            // If guide, we might want to hide the first H1 in the markdown to check logic?
+                            // Actually, let's keep it simple. Hero is ABOVE content.
+                            
+                            document.title = `${this.pageTitles[page]} - Laravel Modular`;
+                        } catch (e) {
+                            console.error("Load Page Error", e);
+                            contentEl.innerHTML =
+                                '<div style="padding: 2rem; background: var(--bg-2); border-radius: 8px;"><h3>Error</h3><p>Could not load page. Ensure the markdown file exists.</p></div>';
+                        }
+                    },
+                    generateNextSteps() {
+                        const el = document.getElementById("next-steps");
+                        const pages = Object.keys(this.pageTitles);
+                        const idx = pages.indexOf(this.currentPage);
+                        
+                        let html = '<div class="next-steps">';
+                        
+                        // Previous
+                        if (idx > 0) {
+                            const prev = pages[idx - 1];
+                            html += `<a href="#" onclick="window.docsAppInstance.loadPage('${prev}'); return false;" class="next-btn">
+                                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                                <div class="next-btn-content">
+                                    <span class="next-btn-label">Previous</span>
+                                    <span class="next-btn-title">${this.pageTitles[prev]}</span>
+                                </div>
+                            </a>`;
+                        } else {
+                            html += '<div></div>'; // spacer
+                        }
+                        
+                        // Next
+                        if (idx < pages.length - 1) {
+                            const next = pages[idx + 1];
+                            html += `<a href="#" onclick="window.docsAppInstance.loadPage('${next}'); return false;" class="next-btn" style="text-align: right; justify-content: flex-end;">
+                                <div class="next-btn-content">
+                                    <span class="next-btn-label">Next</span>
+                                    <span class="next-btn-title">${this.pageTitles[next]}</span>
+                                </div>
+                                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                            </a>`;
+                        }
+                        
+                        html += '</div>';
+                        el.innerHTML = html;
+                    },
+                    generateJumpMenu() {
+                        const headings = document
+                            .getElementById("content")
+                            .querySelectorAll("h2, h3");
+                        const list = document.getElementById("jump-list");
+                        list.innerHTML = "";
+                        headings.forEach((h, i) => {
+                            h.id = `heading-${i}`;
+                            const li = document.createElement("li");
+                            const a = document.createElement("a");
+                            a.href = `#heading-${i}`;
+                            a.className = `jump-link ${h.tagName === "H3" ? "level-3" : ""}`;
+                            a.textContent = h.textContent;
+                            a.onclick = (e) => {
+                                e.preventDefault();
+                                h.scrollIntoView({
+                                    behavior: "smooth",
+                                    block: "start",
+                                });
+                            };
+                            li.appendChild(a);
+                            list.appendChild(li);
+                        });
+                    },
+                    processAdmonitions(el) {
+                        const quotes = el.querySelectorAll('blockquote');
+                        quotes.forEach(q => {
+                            const html = q.innerHTML;
+                            // Check for GFM alert patterns: <p>[!NOTE]</p> or <p>[!NOTE]<br>
+                            // marked.js often puts the [!NOTE] inside a p tag.
+                             const typeMatch = html.match(/\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]/i);
+                             
+                             if (typeMatch) {
+                                 const type = typeMatch[1].toLowerCase();
+                                 const cleanHtml = html.replace(/\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]/i, '').replace(/^\s*<p>\s*/, '<p>').replace(/<p>\s*<br>\s*/, '<p>'); // basic cleanup
+                                 
+                                 const div = document.createElement('div');
+                                 div.className = `admonition adm-${type}`;
+                                 div.innerHTML = `<span class="admonition-title">${type.toUpperCase()}</span>${cleanHtml}`;
+                                 q.parentNode.replaceChild(div, q);
+                             }
+                        });
+                    },
+                    injectCopyButtons(el) {
+                        el.querySelectorAll('pre').forEach(pre => {
+                            if (pre.querySelector('.copy-btn')) return;
+                            const btn = document.createElement('button');
+                            btn.className = 'copy-btn';
+                            btn.textContent = 'Copy';
+                            btn.onclick = () => {
+                                const code = pre.querySelector('code').innerText;
+                                navigator.clipboard.writeText(code).then(() => {
+                                    btn.textContent = 'Copied!';
+                                    setTimeout(() => btn.textContent = 'Copy', 2000);
+                                });
+                            };
+                            pre.appendChild(btn);
+                        });
+                    },
+                    injectEditLink(page) {
+                         // Remove existing edit link if any
+                         const existing = document.querySelector('.edit-page-link');
+                         if(existing) existing.remove();
+                         
+                         const footerContent = document.querySelector('.footer-content');
+                         if(!footerContent) return;
+                         
+                         const editLink = document.createElement('a');
+                         editLink.href = `https://github.com/alizharb/laravel-modular/edit/main/docs/${page}.md`;
+                         editLink.className = 'edit-page-link';
+                         editLink.target = '_blank';
+                         editLink.textContent = 'Edit this page on GitHub';
+                         editLink.style.cssText = 'display: inline-block; margin-top: 2rem; color: var(--text-3); font-size: 0.85rem; text-decoration: none; border-bottom: 1px dashed var(--border);';
+                         
+                         const article = document.getElementById('content');
+                         article.appendChild(editLink);
+                    },
+                    updateActiveJump() {
+                        const headings = document.querySelectorAll(
+                            ".prose h2, .prose h3",
+                        );
+                        let current = "";
+                        headings.forEach((h) => {
+                            if (h.getBoundingClientRect().top <= 100)
+                                current = h.id;
+                        });
+                        document.querySelectorAll(".jump-link").forEach((l) => {
+                            l.classList.toggle(
+                                "active",
+                                l.getAttribute("href") === `#${current}`,
+                            );
+                        });
+                    },
+                    getIconForPage(page) {
+                         const icons = {
+                             installation: '<svg width="32" height="32" fill="none" class="text-accent" style="display:inline-block; vertical-align:middle; margin-right:12px; margin-bottom:4px;" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>',
+                             guide: '<svg width="32" height="32" fill="none" class="text-accent" style="display:inline-block; vertical-align:middle; margin-right:12px; margin-bottom:4px;" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>',
+                             architecture: '<svg width="32" height="32" fill="none" class="text-accent" style="display:inline-block; vertical-align:middle; margin-right:12px; margin-bottom:4px;" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>',
+                             configuration: '<svg width="32" height="32" fill="none" class="text-accent" style="display:inline-block; vertical-align:middle; margin-right:12px; margin-bottom:4px;" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>',
+                             commands: '<svg width="32" height="32" fill="none" class="text-accent" style="display:inline-block; vertical-align:middle; margin-right:12px; margin-bottom:4px;" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>',
+                             helpers: '<svg width="32" height="32" fill="none" class="text-accent" style="display:inline-block; vertical-align:middle; margin-right:12px; margin-bottom:4px;" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>',
+                             frontend: '<svg width="32" height="32" fill="none" class="text-accent" style="display:inline-block; vertical-align:middle; margin-right:12px; margin-bottom:4px;" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>',
+                             advanced: '<svg width="32" height="32" fill="none" class="text-accent" style="display:inline-block; vertical-align:middle; margin-right:12px; margin-bottom:4px;" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.756 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>',
+                             testing: '<svg width="32" height="32" fill="none" class="text-accent" style="display:inline-block; vertical-align:middle; margin-right:12px; margin-bottom:4px;" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>',
+                             deployment: '<svg width="32" height="32" fill="none" class="text-accent" style="display:inline-block; vertical-align:middle; margin-right:12px; margin-bottom:4px;" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>',
+                             ecosystem: '<svg width="32" height="32" fill="none" class="text-accent" style="display:inline-block; vertical-align:middle; margin-right:12px; margin-bottom:4px;" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>'
+                         };
+                         return icons[page] || '';
+                    },
+                    search() {
+                        if (this.searchQuery.length < 2) {
+                            this.searchResults = [];
+                            return;
+                        }
+                        const q = this.searchQuery.toLowerCase();
+                        
+                        // Phase 3: Fuse.js Search
+                        if (window.Fuse && Object.keys(this.allContent).length > 0) {
+                            const list = [];
+                            Object.entries(this.allContent).forEach(([page, content]) => {
+                                if(!content) return; 
+                                const lines = content.split('\n');
+                                lines.forEach((line, i) => {
+                                     // only index headings and text, skip heavy code maybe?
+                                     // simplification: index line by line
+                                     // For better Fuse results, we should chunk by sections
+                                     if(line.trim().length > 5) {
+                                         list.push({
+                                             id: `${page}-${i}`,
+                                             page: page,
+                                             title: this.pageTitles[page] || page,
+                                             content: line
+                                         });
+                                     }
+                                });
+                            });
+                            
+                            const options = {
+                                includeScore: true,
+                                keys: ['content', 'title'],
+                                threshold: 0.4,
+                            };
+                            
+                            const fuse = new Fuse(list, options);
+                            const results = fuse.search(q);
+                            
+                            this.searchResults = results.slice(0, 15).map(r => ({
+                                id: r.item.id,
+                                page: r.item.page,
+                                title: r.item.title,
+                                snippet: r.item.content.substring(0, 80), // potentially limit length
+                                section: 'Best Matches'
+                            }));
+                            this.groupedResults = { "Best Matches": this.searchResults };
+                            return;
+                        }
+                        
+                        // Fallback (Legacy)
+                        const res = [];
+                        Object.entries(this.allContent).forEach(
+                            ([page, content]) => {
+                                const lines = content.split("\n");
+                                let section = "";
+                                lines.forEach((line, i) => {
+                                    if (line.startsWith("## "))
+                                        section = line
+                                            .replace("## ", "")
+                                            .trim();
+                                    if (line.toLowerCase().includes(q)) {
+                                        const clean = line
+                                            .replace(/[#*`]/g, "")
+                                            .trim();
+                                        if (clean)
+                                            res.push({
+                                                id: `${page}-${i}`,
+                                                page,
+                                                title:
+                                                    section ||
+                                                    this.pageTitles[page],
+                                                snippet: clean.substring(0, 80),
+                                                section: "Results", // simplified grouping
+                                            });
+                                    }
+                                });
+                            },
+                        );
+                        // unique
+                        this.searchResults = res
+                            .filter(
+                                (v, i, a) =>
+                                    a.findIndex(
+                                        (t) => t.snippet === v.snippet,
+                                    ) === i,
+                            )
+                            .slice(0, 20);
+                        this.groupedResults = {
+                            "All Results": this.searchResults,
+                        };
+                    },
+                    goToResult(r) {
+                        this.loadPage(r.page);
+                        this.searchOpen = false;
+                    },
+                };
             }
-            let html = '';
-            headings.forEach((heading, i) => {
-                const id = `heading-${i}`;
-                heading.id = id;
-                const level = heading.tagName === 'H2' ? '' : 'pl-4';
-                html += `<a href="#${id}" class="block ${level} text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors">${heading.textContent}</a>`;
+            let docsAppInstance;
+            document.addEventListener("alpine:init", () => {
+                docsAppInstance = docsApp();
+                window.docsAppInstance = docsAppInstance;
             });
-            toc.innerHTML = html;
-        }
-
-        async function loadDefaultPage() {
-            await loadPage('README.md');
-        }
-
-        function toggleTheme() {
-            currentTheme = currentTheme === 'light' ? 'dark' : 'light';
-            document.documentElement.classList.toggle('dark');
-            localStorage.setItem('theme', currentTheme);
-            updateThemeIcon();
-        }
-
-        function updateThemeIcon() {
-            const icon = document.getElementById('themeIcon');
-            icon.innerHTML = currentTheme === 'dark' 
-                ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>'
-                : '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>';
-        }
-
-        function toggleMobileSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('sidebarOverlay');
-            sidebar.classList.toggle('-translate-x-full');
-            overlay.classList.toggle('hidden');
-        }
-
-
-    </script>
-</body>
+        </script>
+    </body>
 </html>

@@ -1,122 +1,101 @@
-# Global Helpers
+# Helper Functions
 
-Laravel Modular provides convenient global helper functions for accessing module information.
+
 
 ## `module()`
 
-Get the module registry or specific module configuration.
+Access the Module Registry or get configuration for a specific module.
 
-### Get Registry
-
+**Usage 1: Get Registry Instance**
 ```php
 $registry = module();
+// Returns \AlizHarb\Modular\ModuleRegistry
+```
+```php
+$config = module('Shop');
+
+if ($config) {
+    echo $config['version']; // "1.0.0"
+    echo $config['namespace']; // "Modules\Shop\"
+}
 ```
 
-### Get Specific Module
+## `Modular` Facade
+Alternatively, you can use the facade for object-oriented access.
 
 ```php
-$config = module('Blog');
-// Returns: ['name' => 'Blog', 'alias' => 'blog', ...]
+use AlizHarb\Modular\Facades\Modular;
+
+// Get all modules
+$modules = Modular::getModules();
+
+// Check existence
+if (Modular::moduleExists('Shop')) {
+    // ...
+}
 ```
+
+---
 
 ## `module_path()`
 
-Get the absolute path to a module or a file within a module.
+Get the absolute filesystem path to a module.
 
-### Get Module Root
-
+**Usage 1: Module Root**
 ```php
-$path = module_path('Blog');
-// Returns: /path/to/modules/Blog
+$path = module_path('Shop');
+// Result: "/var/www/modules/Shop"
 ```
 
-### Get Specific File
-
+**Usage 2: Specific File**
 ```php
-$viewPath = module_path('Blog', 'resources/views');
-// Returns: /path/to/modules/Blog/resources/views
-
-$modelPath = module_path('Blog', 'app/Models/Post.php');
-// Returns: /path/to/modules/Blog/app/Models/Post.php
+$path = module_path('Shop', 'resources/views/index.blade.php');
+// Result: "/var/www/modules/Shop/resources/views/index.blade.php"
 ```
 
-## `module_asset()`
-
-Generate a public URL for a module asset.
-
-### Usage
-
-```php
-$cssUrl = module_asset('Blog', 'css/app.css');
-// Returns: http://yourapp.test/modules/blog/css/app.css
-
-$imageUrl = module_asset('Blog', 'images/logo.png');
-// Returns: http://yourapp.test/modules/blog/images/logo.png
-```
-
-### In Blade
-
-```blade
-<link rel="stylesheet" href="{{ module_asset('Blog', 'css/app.css') }}">
-<img src="{{ module_asset('Blog', 'images/logo.png') }}" alt="Logo">
-```
-
-## `modular_vite()`
-
-A dedicated Vite helper for modular assets. It automatically targets the correct build directory.
-
-### Usage
-
-```blade
-{{ modular_vite(['resources/css/app.css', 'resources/js/app.js'], 'blog') }}
-```
-
-By default, it uses the `modular.paths.assets` configuration (usually `modules`).
+---
 
 ## `module_config_path()`
 
-Get the absolute path to a module's config directory or file.
-
-### Get Config Directory
+Shortcut to get the path of a config file inside a module.
 
 ```php
-$configDir = module_config_path('Blog');
-// Returns: /path/to/modules/Blog/config
+$path = module_config_path('Shop', 'permissions.php');
+// Result: "/var/www/modules/Shop/config/permissions.php"
 ```
 
-### Get Specific Config File
+---
 
-```php
-$settingsPath = module_config_path('Blog', 'settings.php');
-// Returns: /path/to/modules/Blog/config/settings.php
+## `module_asset()`
+
+Generates a public URL for an asset. Use this when your asset has been published (via `modular:link` or Vite build).
+
+**Usage:**
+```blade
+<img src="{{ module_asset('Shop', 'images/logo.png') }}" />
 ```
+**Result:** `http://your-app.test/modules/shop/images/logo.png`
 
-## Practical Examples
+*Note: The assumption is that assets are symlinked to `public/modules/{module-lower}`.*
 
-### Loading Module Views Dynamically
+---
 
-```php
-$moduleName = 'Blog';
-$viewPath = module_path($moduleName, 'resources/views/posts/index.blade.php');
+## `modular_vite()`
 
-if (file_exists($viewPath)) {
-    return view("{$moduleName}::posts.index");
-}
-```
+Renders the `<script>` and `<link>` tags for Vite HMR (Hot Module Replacement) or production builds.
 
-### Checking Module Existence
+**Important:** This implementation supports loading assets from **any** directory, not just the root `resources/`.
 
-```php
-if (module('Blog')) {
-    // Blog module exists
-}
-```
-
-### Building Asset URLs
-
-```php
-$assets = [
-    module_asset('Blog', 'css/app.css'),
-    module_asset('Blog', 'js/app.js'),
-];
+**Usage in Blade:**
+```blade
+<head>
+    <!-- 
+       Load the specific JS/CSS entry points for the Shop module.
+       This points to modules/Shop/resources/assets/...
+    -->
+    {{ modular_vite([
+        'resources/assets/css/app.css', 
+        'resources/assets/js/app.js'
+    ], 'modules/shop/build') }}
+</head>
 ```

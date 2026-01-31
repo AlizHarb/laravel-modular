@@ -24,6 +24,8 @@ final class ModuleRegistry
      *     requires: array<int, string>,
      *     version: string,
      *     authors: array<int, array{name: string, email?: string, role?: string}>,
+     *     removable: bool,
+     *     disableable: bool,
      *     policies?: array<string, string>,
      *     events?: array<string, array<int, string>|string>,
      *     has_views?: bool,
@@ -97,6 +99,8 @@ final class ModuleRegistry
                 $requires = (array) ($config['requires'] ?? []);
                 $version = (string) ($config['version'] ?? '1.0.0');
                 $authors = (array) ($config['authors'] ?? []);
+                $removable = (bool) ($config['removable'] ?? true);
+                $disableable = (bool) ($config['disableable'] ?? true);
 
                 $this->modules[$name] = [
                     'path' => $directory,
@@ -107,6 +111,8 @@ final class ModuleRegistry
                     'requires' => $requires,
                     'version' => $version,
                     'authors' => $authors,
+                    'removable' => $removable,
+                    'disableable' => $disableable,
                     'policies' => $config['policies'] ?? [],
                     'events' => $config['events'] ?? [],
                     'has_views' => false,
@@ -127,6 +133,8 @@ final class ModuleRegistry
                     'requires' => [],
                     'version' => '1.0.0',
                     'authors' => [],
+                    'removable' => true,
+                    'disableable' => true,
                     'policies' => [],
                     'events' => [],
                     'has_views' => false,
@@ -184,7 +192,7 @@ final class ModuleRegistry
     /**
      * Get the metadata for a specific module.
      *
-     * @return array{path: string, name: string, namespace: string, providers: array<int, string>, middleware: array<int, string>, requires: array<int, string>, version: string, authors: array<int, array{name: string, email?: string, role?: string}>, policies?: array<string, string>, events?: array<string, array<int, string>|string>, has_views?: bool, has_translations?: bool, has_migrations?: bool}|null
+     * @return array{path: string, name: string, namespace: string, providers: array<int, string>, middleware: array<int, string>, requires: array<int, string>, version: string, authors: array<int, array{name: string, email?: string, role?: string}>, removable: bool, disableable: bool, policies?: array<string, string>, events?: array<string, array<int, string>|string>, has_views?: bool, has_translations?: bool, has_migrations?: bool}|null
      */
     public function getModule(string $name): ?array
     {

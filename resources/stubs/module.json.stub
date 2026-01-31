@@ -3,6 +3,8 @@
     "name": "{{name}}",
     "description": "",
     "version": "1.0.0",
+    "removable": true,
+    "disableable": true,
     "authors": [
         {
             "name": "{{authorName}}",

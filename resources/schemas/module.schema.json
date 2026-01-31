@@ -35,6 +35,16 @@
             "type": "string",
             "description": "The PSR-4 namespace of the module."
         },
+        "removable": {
+            "type": "boolean",
+            "description": "Whether the module can be removed via the UI.",
+            "default": true
+        },
+        "disableable": {
+            "type": "boolean",
+            "description": "Whether the module can be disabled via the UI.",
+            "default": true
+        },
         "provider": {
             "type": ["string", "null"],
             "description": "The primary Service Provider for the module."
