@@ -36,7 +36,7 @@ class MiddlewareTest extends TestCase
         }
         File::makeDirectory($this->testModulesPath, 0755, true);
 
-        $this->app->singleton(ModuleRegistry::class, fn () => new ModuleRegistry);
+        $this->app->singleton(ModuleRegistry::class, fn () => new ModuleRegistry());
     }
 
     protected function tearDown(): void

@@ -20,14 +20,14 @@ interface ModularPlugin
     /**
      * Register services for all modules.
      *
-     * @param  array<string, mixed>  $modules
+     * @param array<string, mixed> $modules
      */
     public function register(Application $app, ModuleRegistry $registry, array $modules): void;
 
     /**
      * Boot services for all modules.
      *
-     * @param  array<string, mixed>  $modules
+     * @param array<string, mixed> $modules
      */
     public function boot(Application $app, ModuleRegistry $registry, array $modules): void;
 }

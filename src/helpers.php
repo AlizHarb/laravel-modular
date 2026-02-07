@@ -64,7 +64,7 @@ if (! function_exists('modular_vite')) {
     /**
      * Get the Vite tags for modular assets.
      *
-     * @param  string|array<int, string>  $entryPoints
+     * @param string|array<int, string> $entryPoints
      * @return \Illuminate\Support\HtmlString
      */
     function modular_vite(string|array $entryPoints, ?string $buildDirectory = null): mixed

@@ -18,13 +18,16 @@ it('can cache the module registry', function () {
     }
     file_put_contents($modulePath.'/module.json', json_encode(['name' => 'Blog', 'active' => true]));
 
-    $registry = new ModuleRegistry;
+    $registry = new ModuleRegistry();
     $registry->cache();
 
     expect(File::exists($this->cachePath))->toBeTrue();
 
     $cachedData = require $this->cachePath;
-    expect($cachedData)->toHaveKey('Blog');
+    expect($cachedData)->toHaveKey('modules');
+    expect($cachedData['modules'])->toHaveKey('Blog');
+    expect($cachedData)->toHaveKey('statuses');
+    expect($cachedData['statuses'])->toHaveKey('Blog');
 
     // Cleanup
     File::deleteDirectory(base_path('modules/Blog'));
@@ -32,12 +35,17 @@ it('can cache the module registry', function () {
 
 it('uses the cache if it exists', function () {
     $cacheData = [
-        'CachedModule' => [
-            'name' => 'CachedModule',
-            'path' => '/fake/path',
-            'namespace' => 'Modules\\CachedModule\\',
-            'provider' => null,
-            'requires' => [],
+        'modules' => [
+            'CachedModule' => [
+                'name' => 'CachedModule',
+                'path' => '/fake/path',
+                'namespace' => 'Modules\\CachedModule\\',
+                'provider' => null,
+                'requires' => [],
+            ],
+        ],
+        'statuses' => [
+            'CachedModule' => true,
         ],
     ];
 
@@ -47,7 +55,7 @@ it('uses the cache if it exists', function () {
 
     file_put_contents($this->cachePath, '<?php return '.var_export($cacheData, true).';');
 
-    $registry = new ModuleRegistry;
+    $registry = new ModuleRegistry();
 
     expect($registry->moduleExists('CachedModule'))->toBeTrue();
     expect($registry->getModule('CachedModule')['path'])->toBe('/fake/path');
@@ -59,7 +67,7 @@ it('can clear the modular cache', function () {
     }
     file_put_contents($this->cachePath, '<?php return [];');
 
-    $registry = new ModuleRegistry;
+    $registry = new ModuleRegistry();
     $registry->clearCache();
 
     expect(File::exists($this->cachePath))->toBeFalse();

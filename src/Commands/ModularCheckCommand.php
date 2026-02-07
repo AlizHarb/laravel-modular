@@ -108,7 +108,7 @@ class ModularCheckCommand extends Command
     /**
      * Detect cycles in a dependency graph.
      *
-     * @param  array<string, array<int, string>>  $graph
+     * @param array<string, array<int, string>> $graph
      * @return array<int, array<int, string>>
      */
     protected function detectCycles(array $graph): array

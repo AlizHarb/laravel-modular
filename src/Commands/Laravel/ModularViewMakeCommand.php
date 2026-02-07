@@ -18,7 +18,7 @@ final class ModularViewMakeCommand extends ViewMakeCommand
     /**
      * Get the destination class path.
      *
-     * @param  string  $name
+     * @param string $name
      */
     protected function getPath($name): string
     {

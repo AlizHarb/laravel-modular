@@ -19,7 +19,7 @@ final class ModularSeederMakeCommand extends SeederMakeCommand
     /**
      * Get the destination class path.
      *
-     * @param  string  $name
+     * @param string $name
      */
     protected function getPath($name): string
     {

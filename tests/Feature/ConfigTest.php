@@ -10,7 +10,7 @@ class ConfigTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->app->singleton(ModuleRegistry::class, fn () => new ModuleRegistry);
+        $this->app->singleton(ModuleRegistry::class, fn () => new ModuleRegistry());
     }
 
     public function test_it_registers_module_configs_using_namespace_syntax()

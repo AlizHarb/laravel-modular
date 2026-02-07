@@ -53,14 +53,25 @@ final class ModularMakeModuleCommand extends Command
         $this->createRoutes($path, $name);
         $this->createTestConfig($path, $name);
         $this->createAssets($path, $name);
+        $this->createGitFiles($path);
 
         $this->info("Module [{$name}] created successfully.");
-        $this->comment("Please run 'composer dump-autoload' and 'php artisan modular:install' if you haven't yet.");
+
+        // Automatically clear modular cache to pick up new module
+        if (config('modular.cache.enabled')) {
+            $this->callSilent('modular:cache');
+        } else {
+            $this->callSilent('modular:clear');
+        }
+
+        // Automatically link assets if configured
+        if (config('modular.auto_link', true)) {
+            $this->callSilent('modular:link');
+        }
+
+        $this->comment("Please run 'composer dump-autoload' if you haven't yet.");
 
         $moduleLower = strtolower($name);
-        /** @var \Illuminate\Contracts\Cache\Repository $cache */
-        $cache = app()->make('cache');
-        $cache->forget("modular.livewire.components.{$moduleLower}");
 
         return self::SUCCESS;
     }
@@ -177,9 +188,36 @@ final class ModularMakeModuleCommand extends Command
     }
 
     /**
+     * Create Git related files within the module.
+     */
+    protected function createGitFiles(string $path): void
+    {
+        $gitignore = <<<'GIT'
+/vendor
+/node_modules
+/.phpunit.result.cache
+/tests/_output
+/tests/_support/_generated
+phpunit.xml
+.DS_Store
+GIT;
+
+        $gitattributes = <<<'GIT'
+* text=auto
+*.php text eol=lf
+*.js text eol=lf
+*.css text eol=lf
+*.md text eol=lf
+GIT;
+
+        File::put("{$path}/.gitignore", $gitignore);
+        File::put("{$path}/.gitattributes", $gitattributes);
+    }
+
+    /**
      * Get the contents of a stub file and replace placeholders.
      *
-     * @param  array<string, string>  $replace
+     * @param array<string, string> $replace
      *
      * @throws \Exception
      */

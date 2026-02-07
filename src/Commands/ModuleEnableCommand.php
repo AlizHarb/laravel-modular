@@ -31,6 +31,15 @@ class ModuleEnableCommand extends Command
         $moduleName = (string) $this->argument('module');
 
         $activator = $registry->getActivator();
+
+        // Dependency Enforcement
+        $check = $registry->checkDependencies($moduleName);
+        if (! $check['satisfied']) {
+            $this->error("Cannot enable module [{$moduleName}]. Missing dependencies: ".implode(', ', $check['missing']));
+
+            return self::FAILURE;
+        }
+
         $activator->setStatus($moduleName, true);
 
         $this->components->info("Module [{$moduleName}] enabled successfully.");

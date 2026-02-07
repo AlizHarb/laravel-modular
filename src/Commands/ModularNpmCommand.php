@@ -7,7 +7,6 @@ namespace AlizHarb\Modular\Commands;
 use AlizHarb\Modular\Concerns\ModularCommand;
 use AlizHarb\Modular\ModuleRegistry;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\File;
 use Symfony\Component\Process\Process;
 
 /**
@@ -55,7 +54,7 @@ final class ModularNpmCommand extends Command
             $this->components->info('Running npm install at root for workspaces...');
         }
 
-        $this->components->info("Running: " . implode(' ', $npmCommand));
+        $this->components->info('Running: '.implode(' ', $npmCommand));
 
         $process = new Process($npmCommand, base_path(), null, null, null);
         $process->setTty(Process::isTtySupported());

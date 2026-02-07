@@ -2,6 +2,24 @@
 
 All notable changes to `laravel-modular` will be documented in this file.
 
+## v1.1.4 - 2026-02-06
+
+### Added
+
+- **Enhanced `make:module`**: Automatically generate `.gitignore` and `.gitattributes` files within new modules to encourage a "module-as-a-package" workflow.
+- **Inter-Module Dependency Enforcement**: The `module:enable` command now verifies that required dependencies (defined in `module.json`) are also enabled.
+- **Activation Caching**: Introduced a high-performance caching layer for module activation statuses. Caching is now integrated into the `modular:cache` command, reducing filesystem hits during bootstrap.
+- **Advanced Diagnostics**: Expanded `modular:doctor` with new checks for ghost modules (directories without `module.json`), duplicate service provider registrations, and asset linking verification.
+- **New `modular:doctor` Command**: Introduced `php artisan modular:doctor` to diagnose common configuration issues, verify dependencies, and validate module structure.
+- **PHP 8.4 & 8.5 Support**: Updated CI workflows to verify compatibility with upcoming PHP versions.
+- **Test Script Configuration**: `modular:install` now automatically configures the `composer.json` "test" script to run both application and module tests in isolation.
+
+### Changed
+
+- **Standardized Configuration**: enforced consistent `pint.json` and `composer.json` dev-dependencies across the entire ecosystem.
+- **Refactored `HasCommands`**: Simplified internal trait by replacing ~60 lines of imports with clean namespace aliases.
+- **Isolated Testing**: `php artisan modular:test` (without arguments) now sequentially runs tests for *all* modules in their own isolated environments.
+
 ## v1.1.3 - 2026-01-31
 
 ### Added
@@ -40,11 +58,13 @@ All notable changes to `laravel-modular` will be documented in this file.
 ## v1.1.1 - 2026-01-26
 
 ### Added
+
 - **Independent Vite Loader**: Introduced `vite.modular.js` for clean, standalone asset discovery in `modules/`.
 - **Improved Installation**: `modular:install` now asks for user consent before automatically updating `composer.json` and `vite.config.js`.
 - **Manual Configuration Guide**: Added detailed instructions and code snippets when the user chooses to manually configure Vite.
 
 ### Fixed
+
 - **Module Stub Namespace**: Fixed incorrect `app` segment in the Service Provider namespace in `module.json.stub`.
 - **Test Infrastructure**: Optimized `phpunit.xml` and `phpstan.neon` for independent package verification.
 
@@ -53,6 +73,7 @@ All notable changes to `laravel-modular` will be documented in this file.
 ## v1.1.0 - 2026-01-25
 
 ### Added
+
 - **Native Routing**: Support for `web.php`, `api.php`, and `console.php` with full Route Caching support.
 - **Config Merging**: Automatic merging of module config files into `modules.{module}.{file}`.
 - **Provider Auto-Discovery**: Support for `providers` array in `module.json` for auto-registration.
@@ -77,11 +98,13 @@ All notable changes to `laravel-modular` will be documented in this file.
 - **Themer Integration**: Optional, first-class support for `alizharb/laravel-themer`.
 
 ### Changed
+
 - Improved `ModuleRegistry` with lazy discovery and caching.
 - Optimized `HasCommands` and `HasResources` traits for better performance.
 - Updated module stubs to include the latest conventions and schema support.
 
 ### Fixed
+
 - Improved path resolution in test environments.
 - Fixed command registration timing in feature tests.
 - Resolved various linting and static analysis warnings.

@@ -40,6 +40,13 @@ final class ModuleRegistry
     protected array $modules = [];
 
     /**
+     * The activation statuses of discovered modules.
+     *
+     * @var array<string, bool>
+     */
+    protected array $statuses = [];
+
+    /**
      * The module activator instance.
      */
     protected ?Activator $activator = null;
@@ -60,7 +67,9 @@ final class ModuleRegistry
         $cachePath = config('modular.cache.path', base_path('bootstrap/cache/modular.php'));
 
         if (file_exists($cachePath)) {
-            $this->modules = require $cachePath;
+            $cache = require $cachePath;
+            $this->modules = $cache['modules'] ?? [];
+            $this->statuses = $cache['statuses'] ?? [];
 
             return;
         }
@@ -76,76 +85,55 @@ final class ModuleRegistry
 
         foreach ($directories as $directory) {
             $moduleJsonPath = $directory.'/module.json';
-            $name = basename($directory);
-
-            if (! $activator->isEnabled($name)) {
-                continue;
-            }
+            $dirName = basename($directory);
+            $name = $dirName;
+            $config = [];
 
             if (File::exists($moduleJsonPath)) {
                 $content = File::get($moduleJsonPath);
                 /** @var array<string, mixed> $config */
                 $config = json_decode($content, true) ?: [];
+                $name = (string) ($config['name'] ?? $dirName);
+            }
 
-                $name = (string) ($config['name'] ?? $name);
-                $namespace = (string) ($config['namespace'] ?? "Modules\\{$name}\\");
-                $providers = isset($config['providers']) ? (array) $config['providers'] : [];
-                if (isset($config['provider'])) {
-                    $providers[] = (string) $config['provider'];
-                }
+            // Populate status from activator if not cached
+            $this->statuses[$name] = $activator->isEnabled($name);
 
-                $middleware = isset($config['middleware']) ? (array) $config['middleware'] : [];
+            $namespace = (string) ($config['namespace'] ?? "Modules\\{$name}\\");
+            $providers = isset($config['providers']) ? (array) $config['providers'] : [];
+            if (isset($config['provider'])) {
+                $providers[] = (string) $config['provider'];
+            }
 
-                $requires = (array) ($config['requires'] ?? []);
-                $version = (string) ($config['version'] ?? '1.0.0');
-                $authors = (array) ($config['authors'] ?? []);
-                $removable = (bool) ($config['removable'] ?? true);
-                $disableable = (bool) ($config['disableable'] ?? true);
+            $middleware = isset($config['middleware']) ? (array) $config['middleware'] : [];
 
-                $this->modules[$name] = [
-                    'path' => $directory,
-                    'name' => $name,
-                    'namespace' => $namespace,
-                    'providers' => $providers,
-                    'middleware' => $middleware,
-                    'requires' => $requires,
-                    'version' => $version,
-                    'authors' => $authors,
-                    'removable' => $removable,
-                    'disableable' => $disableable,
-                    'policies' => $config['policies'] ?? [],
-                    'events' => $config['events'] ?? [],
-                    'has_views' => false,
-                    'has_translations' => false,
-                    'has_migrations' => false,
-                    'discovery_info' => [
-                        'policies' => [],
-                        'events' => [],
-                    ],
-                ];
-            } else {
-                $this->modules[$name] = [
-                    'path' => $directory,
-                    'name' => $name,
-                    'namespace' => "Modules\\{$name}\\",
-                    'providers' => [],
-                    'middleware' => [],
-                    'requires' => [],
-                    'version' => '1.0.0',
-                    'authors' => [],
-                    'removable' => true,
-                    'disableable' => true,
+            $requires = (array) ($config['requires'] ?? []);
+            $version = (string) ($config['version'] ?? '1.0.0');
+            $authors = (array) ($config['authors'] ?? []);
+            $removable = (bool) ($config['removable'] ?? true);
+            $disableable = (bool) ($config['disableable'] ?? true);
+
+            $this->modules[$name] = [
+                'path' => $directory,
+                'name' => $name,
+                'namespace' => $namespace,
+                'providers' => $providers,
+                'middleware' => $middleware,
+                'requires' => $requires,
+                'version' => $version,
+                'authors' => $authors,
+                'removable' => $removable,
+                'disableable' => $disableable,
+                'policies' => $config['policies'] ?? [],
+                'events' => $config['events'] ?? [],
+                'has_views' => false,
+                'has_translations' => false,
+                'has_migrations' => false,
+                'discovery_info' => [
                     'policies' => [],
                     'events' => [],
-                    'has_views' => false,
-                    'has_translations' => false,
-                    'has_migrations' => false,
-                    'discovery_info' => [
-                        'policies' => [],
-                        'events' => [],
-                    ],
-                ];
-            }
+                ],
+            ];
         }
     }
 
@@ -172,7 +160,13 @@ final class ModuleRegistry
     public function cache(): void
     {
         $cachePath = config('modular.cache.path', base_path('bootstrap/cache/modular.php'));
-        $content = '<?php return '.var_export($this->modules, true).';'.PHP_EOL;
+
+        $cache = [
+            'modules' => $this->modules,
+            'statuses' => $this->statuses,
+        ];
+
+        $content = '<?php return '.var_export($cache, true).';'.PHP_EOL;
 
         File::put($cachePath, $content);
     }
@@ -248,8 +242,8 @@ final class ModuleRegistry
     /**
      * Set the discovered resource mappings for a module.
      *
-     * @param  array<string, string>  $policies
-     * @param  array<int, string>  $events
+     * @param array<string, string> $policies
+     * @param array<int, string> $events
      */
     public function setDiscoveredResources(string $moduleName, array $policies, array $events): void
     {
@@ -333,5 +327,44 @@ final class ModuleRegistry
     public function getDiscoveryInfo(string $moduleName): array
     {
         return $this->modules[$moduleName]['discovery_info'] ?? ['policies' => [], 'events' => []];
+    }
+
+    /**
+     * Check if a module is enabled.
+     */
+    public function isEnabled(string $name): bool
+    {
+        if (isset($this->statuses[$name])) {
+            return $this->statuses[$name];
+        }
+
+        return $this->getActivator()->isEnabled($name);
+    }
+
+    /**
+     * Check if a module's dependencies are satisfied.
+     *
+     * @return array{satisfied: bool, missing: array<int, string>}
+     */
+    public function checkDependencies(string $moduleName): array
+    {
+        $module = $this->getModule($moduleName);
+
+        if (! $module) {
+            // If not in registry, its dependencies aren't even loadable
+            return ['satisfied' => false, 'missing' => [$moduleName]];
+        }
+
+        $missing = [];
+        foreach ($module['requires'] as $dependency) {
+            if (! $this->moduleExists($dependency) || ! $this->isEnabled($dependency)) {
+                $missing[] = $dependency;
+            }
+        }
+
+        return [
+            'satisfied' => empty($missing),
+            'missing' => $missing,
+        ];
     }
 }

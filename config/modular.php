@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 return [
-
     /*
     |--------------------------------------------------------------------------
     | Modular Base Paths
@@ -182,4 +181,15 @@ return [
         'path' => base_path('bootstrap/cache/modular.php'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Automatic Asset Linking
+    |--------------------------------------------------------------------------
+    |
+    | When enabled, Laravel Modular will automatically run 'modular:link'
+    | after creating a new module to ensure assets are immediately available.
+    |
+    */
+
+    'auto_link' => true,
 ];

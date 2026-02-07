@@ -46,7 +46,7 @@ class ModuleUninstallCommand extends Command
 
         if (! $this->confirm("Are you sure you want to uninstall module [{$moduleName}]? This will delete all module files.", $this->option('force'))) {
             $this->info('Operation cancelled.');
-            
+
             return self::SUCCESS;
         }
 

@@ -55,7 +55,7 @@ final class ModularSyncCommand extends Command
             }
 
             $moduleComposer = json_decode((string) File::get($moduleComposerPath), true);
-            
+
             foreach ($moduleComposer['require'] ?? [] as $package => $version) {
                 if ($this->shouldSync($package)) {
                     $allRequires[$package] = $version;
@@ -87,7 +87,7 @@ final class ModularSyncCommand extends Command
             $rootComposer['require-dev'] = array_merge($rootComposer['require-dev'] ?? [], $allDevRequires);
 
             File::put($composerJsonPath, (string) json_encode($rootComposer, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
-            
+
             $this->components->info('Dependencies synced successfully! Please run "composer update".');
         }
 
@@ -101,7 +101,7 @@ final class ModularSyncCommand extends Command
     {
         // Skip PHP and Laravel internal packages if they are usually in root
         $skip = ['php', 'ext-json', 'ext-mbstring', 'illuminate/contracts', 'illuminate/support'];
-        
+
         return ! in_array($package, $skip);
     }
 

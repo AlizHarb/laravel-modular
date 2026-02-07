@@ -17,14 +17,14 @@
     },
     "require-dev": {
         "orchestra/testbench": "^9.5|^10.0",
-        "pestphp/pest": "*",
-        "pestphp/pest-plugin-laravel": "*",
-        "phpstan/phpstan": "*",
-        "rector/rector": "*",
+        "pestphp/pest": "^3.0",
+        "pestphp/pest-plugin-laravel": "^3.0",
+        "phpstan/phpstan": "^2.1",
+        "rector/rector": "^2.0",
         "driftingly/rector-laravel": "^2.1",
-        "larastan/larastan": "^3.9",
-        "phpunit/phpunit": "*",
-        "mockery/mockery": "*",
+        "larastan/larastan": "^3.0",
+        "phpunit/phpunit": "^11.5|^12.0",
+        "mockery/mockery": "^1.6",
         "spatie/phpunit-snapshot-assertions": "^5.1",
         "laravel/pint": "^1.24"
     },
@@ -74,7 +74,5 @@
             "wikimedia/composer-merge-plugin": true,
             "pestphp/pest-plugin": true
         }
-    },
-    "minimum-stability": "dev",
-    "prefer-stable": true
+    }
 }

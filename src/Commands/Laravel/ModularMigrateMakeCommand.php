@@ -17,8 +17,8 @@ final class ModularMigrateMakeCommand extends MigrateMakeCommand
     /**
      * Create a new migration install command instance.
      *
-     * @param  \Illuminate\Database\Migrations\MigrationCreator  $creator
-     * @param  \Illuminate\Support\Composer  $composer
+     * @param \Illuminate\Database\Migrations\MigrationCreator $creator
+     * @param \Illuminate\Support\Composer $composer
      * @return void
      */
     public function __construct($creator, $composer)

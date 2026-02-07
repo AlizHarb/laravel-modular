@@ -34,6 +34,7 @@ it('can install modular and configure vite automatically', function () {
         ->expectsConfirmation("Would you like to add optimized PSR-4 autoloading for 'Modules\\' to your composer.json?", 'yes')
         ->expectsConfirmation('Would you like to automatically configure it?', 'yes')
         ->expectsConfirmation('Would you like to automatically configure vite.config.js?', 'yes')
+        ->expectsConfirmation('Would you like to add a "test" script to run both app and module tests?', 'yes')
         ->expectsConfirmation('Would you like to show some love by starring the repo on GitHub? ⭐', 'no')
         ->assertExitCode(0);
 
@@ -66,6 +67,7 @@ it('can install modular and show manual configuration if declined', function () 
         ->expectsConfirmation("Would you like to add optimized PSR-4 autoloading for 'Modules\\' to your composer.json?", 'no')
         ->expectsConfirmation('Would you like to automatically configure it?', 'no')
         ->expectsConfirmation('Would you like to automatically configure vite.config.js?', 'no')
+        ->expectsConfirmation('Would you like to add a "test" script to run both app and module tests?', 'no')
         ->expectsConfirmation('Would you like to show some love by starring the repo on GitHub? ⭐', 'no')
         ->assertExitCode(0);
 

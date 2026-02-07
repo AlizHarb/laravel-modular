@@ -31,7 +31,7 @@ beforeEach(function () {
     File::makeDirectory($this->testModulesPath, 0755, true);
 
     // Ensure registry is bound and refreshed with new config
-    $this->app->singleton(ModuleRegistry::class, fn () => new ModuleRegistry);
+    $this->app->singleton(ModuleRegistry::class, fn () => new ModuleRegistry());
 
     Config::set('app.key', 'base64:'.base64_encode(random_bytes(32)));
     Config::set('app.cipher', 'AES-256-CBC');
@@ -100,7 +100,7 @@ PHP;
 
     // 6. Boot the Package Logic
     // Re-instantiate registry to pick up new module
-    $registry = new ModuleRegistry;
+    $registry = new ModuleRegistry();
     $this->app->instance(ModuleRegistry::class, $registry);
 
     $sp = new \AlizHarb\Modular\ModularServiceProvider($this->app);
@@ -121,7 +121,7 @@ PHP;
     // 10. Verify Toggle (Memory Solution)
     // Clean up registry to force reload config
     $this->app->forgetInstance(ModuleRegistry::class);
-    $this->app->singleton(ModuleRegistry::class, fn () => new ModuleRegistry);
+    $this->app->singleton(ModuleRegistry::class, fn () => new ModuleRegistry());
 
     // Disable aliasing
     Config::set('modular.config.alias', false);

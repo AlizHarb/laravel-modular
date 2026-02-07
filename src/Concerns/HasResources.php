@@ -19,7 +19,6 @@ trait HasResources
         $modules = $registry->getModules();
 
         foreach ($modules as $moduleName => $module) {
-
         }
     }
 
@@ -129,7 +128,7 @@ trait HasResources
     /**
      * Register integration with Laravel Themer if available.
      *
-     * @param  array<string, mixed>  $modules
+     * @param array<string, mixed> $modules
      */
     protected function registerThemerIntegration(ModuleRegistry $registry, array $modules): void
     {
@@ -139,7 +138,7 @@ trait HasResources
 
             if (class_exists('AlizHarb\\Themer\\Plugins\\ModulesPlugin')) {
                 $pluginClass = 'AlizHarb\\Themer\\Plugins\\ModulesPlugin';
-                $themer::registerPlugin(new $pluginClass);
+                $themer::registerPlugin(new $pluginClass());
             }
         }
     }

@@ -49,7 +49,7 @@ final class ModularServiceProvider extends PackageServiceProvider
      */
     public function packageRegistered(): void
     {
-        $this->app->singleton(ModuleRegistry::class, fn () => new ModuleRegistry);
+        $this->app->singleton(ModuleRegistry::class, fn () => new ModuleRegistry());
 
         $this->app->alias(ModuleRegistry::class, 'modular.registry');
         $this->app->alias('Modular', Facades\Modular::class);
@@ -85,6 +85,7 @@ final class ModularServiceProvider extends PackageServiceProvider
         $this->bootModularResources();
 
         $this->app->booted(function () {
+            $this->registerModuleMiddleware();
             $this->registerModuleRoutes();
         });
     }
@@ -98,8 +99,10 @@ final class ModularServiceProvider extends PackageServiceProvider
         $modules = $registry->getModules();
 
         foreach ($modules as $module) {
-            foreach ($module['providers'] as $provider) {
-                $this->app->register($provider);
+            if ($registry->isEnabled($module['name'])) {
+                foreach ($module['providers'] as $provider) {
+                    $this->app->register($provider);
+                }
             }
         }
     }
@@ -113,6 +116,9 @@ final class ModularServiceProvider extends PackageServiceProvider
         $modules = $registry->getModules();
 
         foreach ($modules as $module) {
+            if (! $registry->isEnabled($module['name'])) {
+                continue;
+            }
             $configPath = $registry->resolvePath($module['name'], 'config');
 
             if (! File::isDirectory($configPath)) {
@@ -145,6 +151,9 @@ final class ModularServiceProvider extends PackageServiceProvider
         $router = $this->app['router'];
 
         foreach ($modules as $module) {
+            if (! $registry->isEnabled($module['name'])) {
+                continue;
+            }
             foreach ($module['middleware'] ?? [] as $key => $middleware) {
                 if (is_string($key)) {
                     if (is_array($middleware)) {
@@ -172,6 +181,9 @@ final class ModularServiceProvider extends PackageServiceProvider
         $modules = $registry->getModules();
 
         foreach ($modules as $module) {
+            if (! $registry->isEnabled($module['name'])) {
+                continue;
+            }
             $routesPath = $registry->resolvePath($module['name'], 'routes');
 
             if (! File::isDirectory($routesPath)) {
@@ -218,6 +230,9 @@ final class ModularServiceProvider extends PackageServiceProvider
             $modules = $registry->getModules();
 
             foreach ($modules as $module) {
+                if (! $registry->isEnabled($module['name'])) {
+                    continue;
+                }
                 $namespace = $module['namespace'];
 
                 if (str_starts_with($class, $namespace)) {

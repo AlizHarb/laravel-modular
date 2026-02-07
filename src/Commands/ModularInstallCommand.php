@@ -39,6 +39,7 @@ class ModularInstallCommand extends Command
         $this->configureVite();
         $this->createViteBaseHelper();
         $this->configureNpmWorkspaces();
+        $this->configureTestScript();
 
         $this->components->info('Laravel Modular has been successfully installed! 🚀');
         $this->comment('You can now create your first module using: php artisan make:module {name}');
@@ -91,7 +92,7 @@ class ModularInstallCommand extends Command
 
         /** @var array<string, mixed> $composer */
         $composer = json_decode((string) File::get($composerJsonPath), true);
-        
+
         // 1. Configure standard PSR-4 for the Modules namespace
         $rootNamespace = config('modular.naming.root_namespace', 'Modules').'\\';
         $modulesPath = Str::after(config('modular.paths.modules', base_path('modules')), base_path().'/').'/';
@@ -244,7 +245,7 @@ class ModularInstallCommand extends Command
 
         /** @var array<string, mixed> $packageJson */
         $packageJson = json_decode((string) File::get($packageJsonPath), true);
-        
+
         $modulesPath = Str::after(config('modular.paths.modules', base_path('modules')), base_path().'/').'/*';
         $workspaces = (array) ($packageJson['workspaces'] ?? []);
 
@@ -259,6 +260,64 @@ class ModularInstallCommand extends Command
                 $this->components->info("Configured package.json workspaces to include {$modulesPath}");
                 $this->warn('Please run "npm install" to initialize workspaces.');
             }
+        }
+    }
+
+    /**
+     * Configure the test script in composer.json.
+     */
+    protected function configureTestScript(): void
+    {
+        $composerJsonPath = base_path('composer.json');
+
+        if (! File::exists($composerJsonPath)) {
+            return;
+        }
+
+        /** @var array<string, mixed> $composer */
+        $composer = json_decode((string) File::get($composerJsonPath), true);
+
+        $scripts = $composer['scripts'] ?? [];
+        $testScript = $scripts['test'] ?? null;
+
+        $modularTestCommand = '@php artisan modular:test';
+        $needsUpdate = false;
+
+        // If 'test' script doesn't exist, create it
+        if (! $testScript) {
+            if ($this->confirm('Would you like to add a "test" script to run both app and module tests?', true)) {
+                $composer['scripts']['test'] = [
+                    '@php artisan test',
+                    $modularTestCommand,
+                ];
+                $needsUpdate = true;
+            }
+        }
+        // If 'test' script exists and is a string
+        elseif (is_string($testScript) && ! str_contains($testScript, 'modular:test')) {
+            $this->components->warn('Your "test" script logic might skip module tests.');
+            if ($this->confirm('Update "test" script to include modular tests separately?', true)) {
+                $composer['scripts']['test'] = [
+                    $testScript,
+                    $modularTestCommand,
+                ];
+                $needsUpdate = true;
+            }
+        }
+        // If 'test' script exists and is an array
+        elseif (is_array($testScript) && ! in_array($modularTestCommand, $testScript)) {
+            $this->components->warn('Your "test" script logic might skip module tests.');
+            if ($this->confirm('Update "test" script to include modular tests separately?', true)) {
+                $composer['scripts']['test'][] = $modularTestCommand;
+                $needsUpdate = true;
+            }
+        }
+
+        if ($needsUpdate) {
+            File::put($composerJsonPath, (string) json_encode($composer, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+            $this->components->info('Updated composer.json "test" script.');
+
+            $this->warn('IMPORTANT: Please ensure your root phpunit.xml excludes "modules/*/tests" to avoid duplicate or failed runs.');
         }
     }
 }

@@ -18,7 +18,7 @@ final class ModularComponentMakeCommand extends ComponentMakeCommand
     /**
      * Get the destination view path.
      *
-     * @param  string  $path
+     * @param string $path
      */
     protected function viewPath($path = ''): string
     {

@@ -41,15 +41,15 @@ final class ModularListCommand extends Command
             return self::SUCCESS;
         }
 
-        if (!$only || $only === 'modules') {
+        if (! $only || $only === 'modules') {
             $this->displayModules($modules);
         }
 
-        if (!$only || $only === 'policies') {
+        if (! $only || $only === 'policies') {
             $this->displayPolicies($modules, $registry);
         }
 
-        if (!$only || $only === 'events') {
+        if (! $only || $only === 'events') {
             $this->displayEvents($modules, $registry);
         }
 
@@ -64,14 +64,14 @@ final class ModularListCommand extends Command
     private function displayModules(array $modules): void
     {
         $this->components->info('Registered Modules');
-        
+
         $rows = [];
         foreach ($modules as $name => $module) {
             $rows[] = [
                 $name,
                 $module['version'] ?? '1.0.0',
                 $module['namespace'],
-                str_replace(base_path() . '/', '', $module['path']),
+                str_replace(base_path().'/', '', $module['path']),
                 ($module['has_migrations'] ?? false) ? '✅' : '❌',
             ];
         }
