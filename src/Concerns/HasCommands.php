@@ -10,6 +10,7 @@ use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Console as DBConsole;
 use Illuminate\Foundation\Console as LaravelConsole;
 use Illuminate\Routing\Console as RoutingConsole;
+use Illuminate\Support\Facades\File;
 
 trait HasCommands
 {
@@ -25,6 +26,11 @@ trait HasCommands
             Commands\ModularLinkCommand::class,
             Commands\ModularCacheCommand::class,
             Commands\ModularClearCommand::class,
+            Commands\ModularRefreshCommand::class,
+            Commands\ModularStatusCommand::class,
+            Commands\ModularGraphCommand::class,
+            Commands\ModularWhyCommand::class,
+            Commands\ModularImportNwidartCommand::class,
             Commands\ModuleEnableCommand::class,
             Commands\ModuleDisableCommand::class,
             Commands\ModuleUninstallCommand::class,
@@ -54,15 +60,15 @@ trait HasCommands
         $modules = $registry->getModules();
 
         foreach ($modules as $moduleName => $module) {
-            $commandPath = $module['path'] . '/app/Console/Commands';
+            $commandPath = $module['path'].'/app/Console/Commands';
 
             if (! is_dir($commandPath)) {
                 continue;
             }
 
-            foreach (\Illuminate\Support\Facades\File::allFiles($commandPath) as $file) {
+            foreach (File::allFiles($commandPath) as $file) {
                 $relativePath = str_replace(['/', '.php'], ['\\', ''], $file->getRelativePathname());
-                $class = rtrim($module['namespace'], '\\') . '\\Console\\Commands\\' . $relativePath;
+                $class = rtrim($module['namespace'], '\\').'\\Console\\Commands\\'.$relativePath;
 
                 if (class_exists($class) && ! (new \ReflectionClass($class))->isAbstract()) {
                     $this->commands($class);

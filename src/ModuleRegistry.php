@@ -22,6 +22,8 @@ final class ModuleRegistry
      *     providers: array<int, string>,
      *     middleware: array<int, string>,
      *     requires: array<int, string>,
+     *     conflicts: array<int, string>,
+     *     provides: array<int, string>,
      *     version: string,
      *     authors: array<int, array{name: string, email?: string, role?: string}>,
      *     removable: bool,
@@ -48,6 +50,13 @@ final class ModuleRegistry
     protected array $statuses = [];
 
     /**
+     * Metadata stored with the cached registry.
+     *
+     * @var array<string, mixed>
+     */
+    protected array $cacheMeta = [];
+
+    /**
      * The module activator instance.
      */
     protected ?Activator $activator = null;
@@ -71,6 +80,7 @@ final class ModuleRegistry
             $cache = require $cachePath;
             $this->modules = $cache['modules'] ?? [];
             $this->statuses = $cache['statuses'] ?? [];
+            $this->cacheMeta = $cache['meta'] ?? [];
 
             return;
         }
@@ -85,7 +95,7 @@ final class ModuleRegistry
         $activator = $this->getActivator();
 
         foreach ($directories as $directory) {
-            $moduleJsonPath = $directory . '/module.json';
+            $moduleJsonPath = $directory.'/module.json';
             $dirName = basename($directory);
             $name = $dirName;
             $config = [];
@@ -108,7 +118,9 @@ final class ModuleRegistry
 
             $middleware = isset($config['middleware']) ? (array) $config['middleware'] : [];
 
-            $requires = (array) ($config['requires'] ?? []);
+            $requires = array_values(array_filter((array) ($config['requires'] ?? []), 'is_string'));
+            $conflicts = array_values(array_filter((array) ($config['conflicts'] ?? []), 'is_string'));
+            $provides = array_values(array_filter((array) ($config['provides'] ?? []), 'is_string'));
             $version = (string) ($config['version'] ?? '1.0.0');
             $authors = (array) ($config['authors'] ?? []);
             $removable = (bool) ($config['removable'] ?? true);
@@ -122,6 +134,8 @@ final class ModuleRegistry
                 'providers' => $providers,
                 'middleware' => $middleware,
                 'requires' => $requires,
+                'conflicts' => $conflicts,
+                'provides' => $provides,
                 'version' => $version,
                 'authors' => $authors,
                 'removable' => $removable,
@@ -149,9 +163,17 @@ final class ModuleRegistry
             $activatorName = config('modular.activator', 'file');
             $activatorClass = config("modular.activators.{$activatorName}.class");
 
-            if ($activatorClass) {
-                $this->activator = app($activatorClass);
+            if (! is_string($activatorClass) || $activatorClass === '') {
+                throw new \RuntimeException("Module activator [{$activatorName}] is not configured.");
             }
+
+            $activator = app($activatorClass);
+
+            if (! $activator instanceof Activator) {
+                throw new \RuntimeException("Module activator [{$activatorClass}] must implement ".Activator::class.'.');
+            }
+
+            $this->activator = $activator;
         }
 
         return $this->activator;
@@ -164,12 +186,15 @@ final class ModuleRegistry
     {
         $cachePath = config('modular.cache.path', base_path('bootstrap/cache/modular.php'));
 
+        $this->cacheMeta = $this->buildCacheMeta();
+
         $cache = [
             'modules' => $this->modules,
             'statuses' => $this->statuses,
+            'meta' => $this->cacheMeta,
         ];
 
-        $content = '<?php return ' . var_export($cache, true) . ';' . PHP_EOL;
+        $content = '<?php return '.var_export($cache, true).';'.PHP_EOL;
 
         File::put($cachePath, $content);
     }
@@ -187,9 +212,70 @@ final class ModuleRegistry
     }
 
     /**
+     * Get metadata loaded from the modular discovery cache.
+     *
+     * @return array<string, mixed>
+     */
+    public function getCacheMeta(): array
+    {
+        return $this->cacheMeta;
+    }
+
+    /**
+     * Determine if the current cache metadata differs from module files on disk.
+     */
+    public function cacheIsStale(): bool
+    {
+        if ($this->cacheMeta === []) {
+            return false;
+        }
+
+        $cachedManifests = $this->cacheMeta['manifest_hashes'] ?? [];
+
+        if (! is_array($cachedManifests)) {
+            return true;
+        }
+
+        foreach ($this->modules as $name => $module) {
+            $manifestPath = $module['path'].'/module.json';
+            $currentHash = is_file($manifestPath) ? hash_file('sha256', $manifestPath) : null;
+
+            if (($cachedManifests[$name] ?? null) !== $currentHash) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    protected function buildCacheMeta(): array
+    {
+        $manifestHashes = [];
+        $dependencyHashes = [];
+        $providers = [];
+
+        foreach ($this->modules as $name => $module) {
+            $manifestPath = $module['path'].'/module.json';
+            $manifestHashes[$name] = is_file($manifestPath) ? hash_file('sha256', $manifestPath) : null;
+            $dependencyHashes[$name] = hash('sha256', json_encode($module['requires']));
+            $providers[$name] = $module['providers'];
+        }
+
+        return [
+            'cached_at' => date(DATE_ATOM),
+            'manifest_hashes' => $manifestHashes,
+            'dependency_hashes' => $dependencyHashes,
+            'providers' => $providers,
+        ];
+    }
+
+    /**
      * Get the metadata for a specific module.
      *
-     * @return array{path: string, name: string, namespace: string, providers: array<int, string>, middleware: array<int, string>, requires: array<int, string>, version: string, authors: array<int, array{name: string, email?: string, role?: string}>, removable: bool, disableable: bool, route_prefix?: string, policies?: array<string, string>, events?: array<string, array<int, string>|string>, has_views?: bool, has_translations?: bool, has_migrations?: bool}|null
+     * @return array{path: string, name: string, namespace: string, providers: array<int, string>, middleware: array<int, string>, requires: array<int, string>, conflicts: array<int, string>, provides: array<int, string>, version: string, authors: array<int, array{name: string, email?: string, role?: string}>, removable: bool, disableable: bool, route_prefix?: string, policies?: array<string, string>, events?: array<string, array<int, string>|string>, has_views?: bool, has_translations?: bool, has_migrations?: bool}|null
      */
     public function getModule(string $name): ?array
     {
@@ -271,7 +357,7 @@ final class ModuleRegistry
             return "Modules\\{$module}\\{$class}";
         }
 
-        return rtrim($moduleData['namespace'], '\\') . '\\' . trim($class, '\\');
+        return rtrim($moduleData['namespace'], '\\').'\\'.trim($class, '\\');
     }
 
     /**
@@ -282,10 +368,10 @@ final class ModuleRegistry
         $moduleData = $this->getModule($module);
 
         if (! $moduleData) {
-            return base_path("modules/{$module}/" . trim($path, '/'));
+            return base_path("modules/{$module}/".trim($path, '/'));
         }
 
-        return $moduleData['path'] . '/' . trim($path, '/');
+        return $moduleData['path'].'/'.trim($path, '/');
     }
 
     /**

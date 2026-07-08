@@ -22,6 +22,12 @@ php artisan view:cache
 php artisan modular:cache
 ```
 
+If your deployment flow may reuse an older discovery cache, use the combined refresh command instead:
+
+```bash
+php artisan modular:refresh
+```
+
 ### What `modular:cache` does
 It scans all your enabled modules and compiles a `bootstrap/cache/modular.php` file.
 - **Without this:** Laravel scans your filesystem on *every request* to find modules, configs, and providers. (Slow)
@@ -30,6 +36,8 @@ It scans all your enabled modules and compiles a `bootstrap/cache/modular.php` f
 ---
 
 ## Continuous Integration (CI/CD)
+
+For a complete CI workflow, see [Continuous Integration](ci.md).
 
 ### GitHub Actions Example
 
@@ -60,7 +68,12 @@ php artisan modular:check
 
 # 2. Run module-specific tests (optional matrix strategy)
 php artisan modular:test Shop
+
+# 3. Emit machine-readable diagnostics
+php artisan modular:doctor --json
 ```
+
+See [Performance](performance.md) for cache metadata, stale cache checks, and production optimization details.
 
 ---
 
@@ -70,7 +83,7 @@ php artisan modular:test Shop
 If you deploy and a module seems missing:
 1.  Run `php artisan modular:list` to check status.
 2.  Check `bootstrap/cache/modules_statuses.json`. This file persists enabled/disabled state. **Git ignore this file** so you don't accidentally disable modules in production that were disabled locally.
-3.  Run `php artisan modular:clear` to ask the system to rescan.
+3.  Run `php artisan modular:refresh` to rebuild discovery from disk.
 
 ### "Class not found"
 If a module class isn't found:

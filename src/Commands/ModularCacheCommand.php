@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace AlizHarb\Modular\Commands;
 
+use AlizHarb\Modular\Events\ModularCached;
 use AlizHarb\Modular\ModuleRegistry;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\File;
 
 class ModularCacheCommand extends Command
 {
@@ -63,6 +66,7 @@ class ModularCacheCommand extends Command
         }
 
         $registry->cache();
+        Event::dispatch(new ModularCached((string) config('modular.cache.path', base_path('bootstrap/cache/modular.php'))));
 
         $this->components->info('Modular registry cached successfully with deep discovery.');
 
@@ -78,7 +82,7 @@ class ModularCacheCommand extends Command
             return [];
         }
 
-        foreach (\Illuminate\Support\Facades\File::allFiles($policyPath) as $file) {
+        foreach (File::allFiles($policyPath) as $file) {
             $className = $file->getBasename('.php');
             $policyClass = rtrim($module['namespace'], '\\')."\\Policies\\{$className}";
 
@@ -104,7 +108,7 @@ class ModularCacheCommand extends Command
             return [];
         }
 
-        foreach (\Illuminate\Support\Facades\File::allFiles($eventsPath) as $file) {
+        foreach (File::allFiles($eventsPath) as $file) {
             $className = $file->getBasename('.php');
             $listenerClass = rtrim($module['namespace'], '\\')."\\Listeners\\{$className}";
 

@@ -10,8 +10,18 @@ Scaling a standard Laravel app can get messy. **Laravel Modular** organizes your
 
 - **Zero Config**: It just works. Auto-discovery for everything.
 - **Native Feel**: Use `php artisan make:model --module=Blog`.
+- **Boost Ready**: Laravel Boost guidance and skills ship with the package.
 - **Production Ready**: Unbeatable performance with built-in caching.
 - **Strict & Typed**: Built for professional, large-scale applications.
+
+## Documentation Map
+
+- [Command Parity](command-parity.md): native Laravel generator support.
+- [Performance](performance.md): discovery caching, stale cache detection, and deployment.
+- [Continuous Integration](ci.md): CI workflows and JSON diagnostics.
+- [Laravel Boost](boost.md): Boost guidelines and skills.
+- [Migration From nwidart](migration-nwidart.md): dry-run migration workflow.
+- [Comparison](comparison.md): positioning against established module packages.
 
 ## Installation
 

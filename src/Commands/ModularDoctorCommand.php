@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace AlizHarb\Modular\Commands;
 
 use AlizHarb\Modular\ModuleRegistry;
+use AlizHarb\Modular\Support\ModuleManifestValidator;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -12,12 +13,22 @@ use Symfony\Component\Console\Attribute\AsCommand;
 #[AsCommand(name: 'modular:doctor')]
 final class ModularDoctorCommand extends Command
 {
-    protected $signature = 'modular:doctor {--score : Show per-module health scores}';
+    protected $signature = 'modular:doctor
+        {--score : Show per-module health scores}
+        {--json : Output a machine-readable diagnostics report}
+        {--fix : Apply safe automatic fixes for common infrastructure issues}';
 
     protected $description = 'Diagnose common configuration issues within the modular ecosystem.';
 
     public function handle(): int
     {
+        if ($this->option('json')) {
+            $report = $this->buildJsonReport();
+            $this->line((string) json_encode($report, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+
+            return $report['healthy'] ? self::SUCCESS : self::FAILURE;
+        }
+
         $this->info('Running Modular Doctor...');
         $this->newLine();
 
@@ -31,6 +42,7 @@ final class ModularDoctorCommand extends Command
             'checkGhostModules',
             'checkDuplicateProviders',
             'checkAssetLinking',
+            'checkCacheFreshness',
         ];
 
         $hasIssues = false;
@@ -63,6 +75,66 @@ final class ModularDoctorCommand extends Command
     }
 
     /**
+     * @return array{
+     *     healthy: bool,
+     *     modules_path: string,
+     *     modules: array<int, array<string, mixed>>,
+     *     issues: array<int, string>
+     * }
+     */
+    private function buildJsonReport(): array
+    {
+        $registry = app(ModuleRegistry::class);
+        $modulesPath = config('modular.paths.modules', base_path('modules'));
+        $issues = [];
+        $modules = [];
+
+        if (! is_string($modulesPath) || ! File::isDirectory($modulesPath)) {
+            $issues[] = "Modules directory [{$modulesPath}] does not exist.";
+        }
+
+        foreach ($registry->getModules() as $name => $module) {
+            $validationErrors = app(ModuleManifestValidator::class)->validate($module['path'], basename($module['path']));
+            $dependencies = $registry->checkDependencies($name);
+
+            foreach ($validationErrors as $error) {
+                $issues[] = "Module [{$name}]: {$error}";
+            }
+
+            if (! $dependencies['satisfied']) {
+                $issues[] = "Module [{$name}] has missing or disabled dependencies: ".implode(', ', $dependencies['missing']);
+            }
+
+            $modules[] = [
+                'name' => $module['name'],
+                'enabled' => $registry->isEnabled($name),
+                'path' => $module['path'],
+                'namespace' => $module['namespace'],
+                'version' => $module['version'],
+                'providers' => $module['providers'],
+                'requires' => $module['requires'],
+                'conflicts' => $module['conflicts'] ?? [],
+                'provides' => $module['provides'] ?? [],
+                'route_prefix' => $module['route_prefix'] ?? '',
+                'validation_errors' => $validationErrors,
+                'dependencies' => $dependencies,
+                'resources' => [
+                    'views' => $registry->hasViews($name),
+                    'translations' => $registry->hasTranslations($name),
+                    'migrations' => $registry->hasMigrations($name),
+                ],
+            ];
+        }
+
+        return [
+            'healthy' => $issues === [],
+            'modules_path' => is_string($modulesPath) ? $modulesPath : '',
+            'modules' => $modules,
+            'issues' => $issues,
+        ];
+    }
+
+    /**
      * Display per-module health scores (0–100).
      *
      * Score breakdown:
@@ -87,7 +159,7 @@ final class ModularDoctorCommand extends Command
             $path = $module['path'];
 
             // Has module.json with name
-            if (File::exists($path . '/module.json') && ! empty($module['name'])) {
+            if (File::exists($path.'/module.json') && ! empty($module['name'])) {
                 $score += 10;
             }
 
@@ -104,19 +176,19 @@ final class ModularDoctorCommand extends Command
             }
 
             // Has migrations directory with at least one file
-            $migrationPath = $path . '/database/migrations';
+            $migrationPath = $path.'/database/migrations';
             if (File::isDirectory($migrationPath) && count(File::files($migrationPath)) > 0) {
                 $score += 15;
             }
 
             // Has tests directory with at least one file
-            $testsPath = $path . '/tests';
+            $testsPath = $path.'/tests';
             if (File::isDirectory($testsPath) && count(File::allFiles($testsPath)) > 0) {
                 $score += 20;
             }
 
             // Has README.md
-            if (File::exists($path . '/README.md')) {
+            if (File::exists($path.'/README.md')) {
                 $score += 10;
             }
 
@@ -148,7 +220,7 @@ final class ModularDoctorCommand extends Command
     protected function checkComposerDependencies(): bool
     {
         $exists = File::exists(base_path('composer.json'));
-        $this->components->task('Checking core dependencies', fn() => $exists);
+        $this->components->task('Checking core dependencies', fn () => $exists);
 
         return $exists;
     }
@@ -158,12 +230,19 @@ final class ModularDoctorCommand extends Command
         $modulesPath = config('modular.paths.modules', base_path('modules'));
 
         if (! File::isDirectory($modulesPath)) {
+            if ($this->option('fix') && is_string($modulesPath)) {
+                File::ensureDirectoryExists($modulesPath);
+                $this->components->info("Created modules directory [{$modulesPath}].");
+
+                return true;
+            }
+
             $this->components->warn("Modules directory [{$modulesPath}] does not exist.");
 
             return false;
         }
 
-        $this->components->task('Checking modules directory', fn() => true);
+        $this->components->task('Checking modules directory', fn () => true);
 
         return true;
     }
@@ -171,15 +250,15 @@ final class ModularDoctorCommand extends Command
     protected function checkVitalConfigFiles(): bool
     {
         $requiredFiles = ['config/modular.php', 'composer.json'];
-        $missing = array_filter($requiredFiles, fn($f) => ! File::exists(base_path($f)));
+        $missing = array_filter($requiredFiles, fn ($f) => ! File::exists(base_path($f)));
 
         if (! empty($missing)) {
-            $this->components->error('Missing vital config files: ' . implode(', ', $missing));
+            $this->components->error('Missing vital config files: '.implode(', ', $missing));
 
             return false;
         }
 
-        $this->components->task('Checking vital configuration files', fn() => true);
+        $this->components->task('Checking vital configuration files', fn () => true);
 
         return true;
     }
@@ -200,7 +279,7 @@ final class ModularDoctorCommand extends Command
             return false;
         }
 
-        $this->components->task('Checking PSR-4 autoloading', fn() => true);
+        $this->components->task('Checking PSR-4 autoloading', fn () => true);
 
         return true;
     }
@@ -208,7 +287,7 @@ final class ModularDoctorCommand extends Command
     protected function checkCircularDependencies(): bool
     {
         $result = $this->callSilent('modular:check');
-        $this->components->task('Checking circular dependencies', fn() => $result === Command::SUCCESS);
+        $this->components->task('Checking circular dependencies', fn () => $result === Command::SUCCESS);
 
         return $result === Command::SUCCESS;
     }
@@ -218,15 +297,18 @@ final class ModularDoctorCommand extends Command
         $registry = app(ModuleRegistry::class);
         $modules = $registry->getModules();
         $allValid = true;
+        $validator = app(ModuleManifestValidator::class);
 
         foreach ($modules as $name => $config) {
-            if (! File::exists($config['path'] . '/module.json')) {
-                $this->components->warn("Module [{$name}] is missing module.json file.");
+            $errors = $validator->validate($config['path'], basename((string) $config['path']));
+
+            foreach ($errors as $error) {
+                $this->components->warn("Module [{$name}]: {$error}");
                 $allValid = false;
             }
         }
 
-        $this->components->task('Validating module metadata', fn() => $allValid);
+        $this->components->task('Validating module metadata', fn () => $allValid);
 
         return $allValid;
     }
@@ -241,16 +323,16 @@ final class ModularDoctorCommand extends Command
 
         $ghosts = array_filter(
             File::directories($modulesPath),
-            fn($dir) => ! File::exists($dir . '/module.json')
+            fn ($dir) => ! File::exists($dir.'/module.json')
         );
 
         if (! empty($ghosts)) {
-            $this->components->warn('Ghost modules detected (directories without module.json): ' . implode(', ', array_map('basename', $ghosts)));
+            $this->components->warn('Ghost modules detected (directories without module.json): '.implode(', ', array_map('basename', $ghosts)));
 
             return false;
         }
 
-        $this->components->task('Checking for ghost modules', fn() => true);
+        $this->components->task('Checking for ghost modules', fn () => true);
 
         return true;
     }
@@ -274,13 +356,13 @@ final class ModularDoctorCommand extends Command
 
         if (! empty($duplicates)) {
             foreach ($duplicates as $provider => $modNames) {
-                $this->components->warn("Duplicate provider [{$provider}] registered in modules: " . implode(', ', array_merge([$allProviders[$provider]], $modNames)));
+                $this->components->warn("Duplicate provider [{$provider}] registered in modules: ".implode(', ', array_merge([$allProviders[$provider]], $modNames)));
             }
 
             return false;
         }
 
-        $this->components->task('Checking for duplicate service providers', fn() => true);
+        $this->components->task('Checking for duplicate service providers', fn () => true);
 
         return true;
     }
@@ -288,13 +370,41 @@ final class ModularDoctorCommand extends Command
     protected function checkAssetLinking(): bool
     {
         if (! File::exists(public_path('modules'))) {
+            if ($this->option('fix')) {
+                File::ensureDirectoryExists(public_path('modules'));
+                $this->components->info('Created module assets directory [public/modules].');
+
+                return true;
+            }
+
             $this->components->warn('Module assets directory [public/modules] does not exist. Run php artisan modular:link.');
 
             return false;
         }
 
-        $this->components->task('Verifying asset linking', fn() => true);
+        $this->components->task('Verifying asset linking', fn () => true);
 
         return true;
+    }
+
+    protected function checkCacheFreshness(): bool
+    {
+        $registry = app(ModuleRegistry::class);
+
+        if (! $registry->cacheIsStale()) {
+            $this->components->task('Checking modular cache freshness', fn () => true);
+
+            return true;
+        }
+
+        if ($this->option('fix')) {
+            $this->call('modular:refresh');
+
+            return true;
+        }
+
+        $this->components->warn('Modular discovery cache is stale. Run php artisan modular:refresh.');
+
+        return false;
     }
 }

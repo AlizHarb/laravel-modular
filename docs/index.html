@@ -1101,6 +1101,13 @@
                     >
                     <a
                         href="#"
+                        @click.prevent="loadPage('command-parity')"
+                        class="nav-link"
+                        :class="{ 'active': currentPage === 'command-parity' }"
+                        >Command Parity</a
+                    >
+                    <a
+                        href="#"
                         @click.prevent="loadPage('helpers')"
                         class="nav-link"
                         :class="{ 'active': currentPage === 'helpers' }"
@@ -1112,6 +1119,13 @@
                         class="nav-link"
                         :class="{ 'active': currentPage === 'frontend' }"
                         >Frontend</a
+                    >
+                    <a
+                        href="#"
+                        @click.prevent="loadPage('boost')"
+                        class="nav-link"
+                        :class="{ 'active': currentPage === 'boost' }"
+                        >Laravel Boost</a
                     >
                 </div>
                 <div class="nav-section">
@@ -1140,6 +1154,20 @@
                         :class="{ 'active': currentPage === 'deployment' }"
                         >Deployment</a
                     >
+                    <a
+                        href="#"
+                        @click.prevent="loadPage('performance')"
+                        class="nav-link"
+                        :class="{ 'active': currentPage === 'performance' }"
+                        >Performance</a
+                    >
+                    <a
+                        href="#"
+                        @click.prevent="loadPage('ci')"
+                        class="nav-link"
+                        :class="{ 'active': currentPage === 'ci' }"
+                        >CI</a
+                    >
                 </div>
                 <div class="nav-section">
                     <div class="nav-title">
@@ -1152,6 +1180,30 @@
                         class="nav-link"
                         :class="{ 'active': currentPage === 'ecosystem' }"
                         >Ecosystem</a>
+                    <a
+                        href="#"
+                        @click.prevent="loadPage('comparison')"
+                        class="nav-link"
+                        :class="{ 'active': currentPage === 'comparison' }"
+                        >Comparison</a>
+                    <a
+                        href="#"
+                        @click.prevent="loadPage('migration-nwidart')"
+                        class="nav-link"
+                        :class="{ 'active': currentPage === 'migration-nwidart' }"
+                        >nwidart Migration</a>
+                    <a
+                        href="#"
+                        @click.prevent="loadPage('release-1.2.0')"
+                        class="nav-link"
+                        :class="{ 'active': currentPage === 'release-1.2.0' }"
+                        >v1.2.0</a>
+                    <a
+                        href="#"
+                        @click.prevent="loadPage('roadmap')"
+                        class="nav-link"
+                        :class="{ 'active': currentPage === 'roadmap' }"
+                        >Roadmap</a>
                 </div>
                 
                 <!-- Mobile Actions (Sidebar) -->
@@ -1275,12 +1327,20 @@
                         architecture: "Modular Architecture",
                         configuration: "Configuration",
                         commands: "Artisan Commands",
+                        "command-parity": "Command Parity",
                         helpers: "Helpers & Utilities",
                         frontend: "Frontend Integration",
+                        boost: "Laravel Boost",
                         advanced: "Advanced Features",
                         testing: "Testing Modules",
                         deployment: "Deployment Guide",
+                        performance: "Performance",
+                        ci: "Continuous Integration",
                         ecosystem: "Ecosystem & Packages",
+                        comparison: "Comparison",
+                        "migration-nwidart": "Migration From nwidart",
+                        "release-1.2.0": "v1.2.0 Release Notes",
+                        roadmap: "Roadmap",
                     },
                     init() {
                         this.$watch("darkMode", (val) =>

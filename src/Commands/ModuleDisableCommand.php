@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace AlizHarb\Modular\Commands;
 
+use AlizHarb\Modular\Events\ModuleDisabled;
+use AlizHarb\Modular\Events\ModuleDisabling;
 use AlizHarb\Modular\ModuleRegistry;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Event;
 
 class ModuleDisableCommand extends Command
 {
@@ -44,11 +47,13 @@ class ModuleDisableCommand extends Command
         }
 
         $activator = $registry->getActivator();
+        Event::dispatch(new ModuleDisabling($moduleName));
         $activator->setStatus($moduleName, false);
 
         $this->components->info("Module [{$moduleName}] disabled successfully.");
 
         $this->call('modular:clear');
+        Event::dispatch(new ModuleDisabled($moduleName));
 
         return self::SUCCESS;
     }

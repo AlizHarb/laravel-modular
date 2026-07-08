@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace AlizHarb\Modular\Commands;
 
+use AlizHarb\Modular\Events\ModuleEnabled;
+use AlizHarb\Modular\Events\ModuleEnabling;
 use AlizHarb\Modular\ModuleRegistry;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Event;
 
 class ModuleEnableCommand extends Command
 {
@@ -40,11 +43,13 @@ class ModuleEnableCommand extends Command
             return self::FAILURE;
         }
 
-        $activator->setStatus($moduleName, true);
+        Event::dispatch(new ModuleEnabling($moduleName));
 
+        $activator->setStatus($moduleName, true);
         $this->components->info("Module [{$moduleName}] enabled successfully.");
 
         $this->call('modular:clear');
+        Event::dispatch(new ModuleEnabled($moduleName));
 
         return self::SUCCESS;
     }

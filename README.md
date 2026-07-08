@@ -8,7 +8,7 @@
 [![Total Downloads](https://img.shields.io/packagist/dt/alizharb/laravel-modular.svg?style=flat-square)](https://packagist.org/packages/alizharb/laravel-modular)
 [![Licence](https://img.shields.io/packagist/l/alizharb/laravel-modular.svg?style=flat-square)](https://packagist.org/packages/alizharb/laravel-modular)
 
-**Laravel Modular** is a professional, framework-agnostic modular system engineered for Laravel 11/12. It empowers you to build scalable, strictly typed, and decoupled applications with zero configuration overhead.
+**Laravel Modular** is a professional, framework-agnostic modular system engineered for Laravel 11/12/13. It empowers you to build scalable, strictly typed, and decoupled applications with zero configuration overhead.
 
 We override 29+ native Artisan commands to provide a seamless "first-class" modular experience, feeling exactly like standard Laravel but better.
 
@@ -21,8 +21,10 @@ We override 29+ native Artisan commands to provide a seamless "first-class" modu
 - 🔄 **Dynamic Activation**: Enable or disable modules on the fly via `module:enable` and `module:disable`.
 - 🔍 **Auto-Discovery**: Automatic registration of Artisan commands, Policies, and Event Listeners within modules.
 - 🔌 **Decoupled Architecture**: Strictly typed `ModuleRegistry` and traits for maximum stability.
-- 🛠️ **Full Customizability**: Override generation stubs globally or specific to a single module via `modules/Shop/stubs`.
-- ✅ **Laravel 11 & 12 Ready**: Optimized for PHP 8.2+ and the latest framework features.
+- 🧭 **Production Diagnostics**: `modular:doctor`, `modular:status`, `modular:debug`, `modular:graph`, and `modular:why` make module state transparent.
+- 🧠 **Laravel Boost Ready**: Ships package guidelines and a dedicated Boost skill for AI-assisted modular development.
+- 🧩 **Migration Friendly**: Includes `modular:import-nwidart` to preview and migrate nwidart-style modules.
+- ✅ **Laravel 11, 12 & 13 Ready**: Optimized for PHP 8.2+ and the latest framework features.
 - 🎨 **Asset Management**: Seamless Vite integration via `modular_vite()` and asset linking.
 
 ---
@@ -44,6 +46,12 @@ Install the package via Composer:
 
 ```bash
 composer require alizharb/laravel-modular
+```
+
+Preview the installer without writing files:
+
+```bash
+php artisan modular:install --dry-run
 ```
 
 Run the installation command to automatically configure your application:
@@ -78,7 +86,7 @@ Add the following to your root `composer.json` to ensure module namespaces are a
 ```
 
 **2. Vite Configuration**
-To enable hot-readling for module assets, create a `vite.modular.js` file in your root and update `vite.config.js`:
+To enable hot-reloading for module assets, create a `vite.modular.js` file in your root and update `vite.config.js`:
 
 ```javascript
 // vite.config.js
@@ -124,6 +132,11 @@ php artisan make:model Post --module=Blog -mcf
 
 # Create a resource controller
 php artisan make:controller API/PostController --module=Blog --api
+
+# Create a request, policy, and test inside the module
+php artisan make:request StorePostRequest --module=Blog
+php artisan make:policy PostPolicy --module=Blog --model=Post
+php artisan make:test PostFeatureTest --module=Blog
 ```
 
 ### Modular Database
@@ -156,6 +169,16 @@ php artisan modular:list --tree
 # Diagnose common configuration issues and view Health Scores
 php artisan modular:doctor
 
+# Output diagnostics for CI, dashboards, and automation
+php artisan modular:doctor --json
+
+# Safely repair missing infrastructure and refresh stale cache
+php artisan modular:doctor --fix
+
+# View project-level modular health
+php artisan modular:status
+php artisan modular:status --json
+
 # Sync module dependencies to root composer.json
 php artisan modular:sync
 
@@ -166,11 +189,26 @@ php artisan modular:export Blog --path=packages/blog
 php artisan modular:npm Blog install
 php artisan modular:npm Blog build
 
-# Check for circular dependencies
+# Check for circular dependencies and conflicts
 php artisan modular:check
 
 # Debug module configuration
 php artisan modular:debug Blog
+php artisan modular:debug Blog --json
+
+# Render a dependency graph
+php artisan modular:graph
+php artisan modular:graph --format=dot
+
+# Explain why a module exists and what it provides
+php artisan modular:why Blog
+
+# Refresh module discovery cache
+php artisan modular:refresh
+
+# Preview or import nwidart-style modules
+php artisan modular:import-nwidart --dry-run
+php artisan modular:import-nwidart Blog --from=NwidartModules
 
 # Run module tests
 php artisan modular:test Blog
@@ -192,11 +230,15 @@ Use our dedicated Blade directives to conditionally render UI based on module av
 
 ### 🏎️ Performance Optimization
 
-For maximum production performance, we recommended the following:
+For maximum production performance, we recommend the following:
 
-1.  **Optimized PSR-4**: Ensure `"Modules\\": "modules/"` is in your root `composer.json`. `modular:install` handles this for you.
-2.  **Dependency Syncing**: Use `php artisan modular:sync` to merge module dependencies into your root `composer.json` and disable the merge-plugin.
-3.  **Discovery Caching**: Always run `php artisan modular:cache` in your deployment pipeline.
+1. **Optimized PSR-4**: Ensure `"Modules\\": "modules/"` is in your root `composer.json`. `modular:install` handles this for you.
+2. **Dependency Syncing**: Use `php artisan modular:sync` to merge module dependencies into your root `composer.json` and disable the merge-plugin.
+3. **Discovery Caching**: Always run `php artisan modular:cache` in your deployment pipeline.
+4. **Cache Refreshing**: Use `php artisan modular:refresh` when deployments reuse build artifacts or cache directories.
+5. **Health Checks**: Run `php artisan modular:doctor --json` in CI or deployment validation.
+
+`modular:cache` stores module metadata, statuses, discovered resources, manifest hashes, dependency hashes, provider lists, and a cache timestamp. `modular:doctor` warns when cached module manifests no longer match disk.
 
 ### Middleware & Config
 
@@ -216,6 +258,60 @@ Access config case-insensitively:
 config('Blog::settings.key');
 config('blog::settings.key');
 ```
+
+### Module Manifest
+
+Every module is described by `module.json`. In v1.2.0, manifests are validated by `modular:doctor` and exposed through JSON diagnostics.
+
+```json
+{
+    "name": "Blog",
+    "namespace": "Modules\\Blog\\",
+    "provider": "Modules\\Blog\\Providers\\BlogServiceProvider",
+    "version": "1.2.0",
+    "requires": [],
+    "conflicts": [],
+    "provides": ["publishing"],
+    "removable": true,
+    "disableable": true
+}
+```
+
+Use `requires` for dependency ordering, `conflicts` for modules that cannot be enabled together, and `provides` for capabilities a module exposes to the application.
+
+### Lifecycle Events
+
+Laravel Modular dispatches lifecycle events for integrations, dashboards, logs, and automation:
+
+- `ModuleEnabling`
+- `ModuleEnabled`
+- `ModuleDisabling`
+- `ModuleDisabled`
+- `ModularCached`
+- `ModularRefreshed`
+
+---
+
+## 🧠 Laravel Boost Support
+
+Laravel Modular ships first-class Laravel Boost resources:
+
+- `resources/boost/guidelines/core.blade.php`
+- `resources/boost/skills/laravel-modular-development/SKILL.md`
+
+After installing Laravel Boost in an application, run:
+
+```bash
+php artisan boost:install
+```
+
+If Laravel Modular was installed after Boost, rediscover package resources:
+
+```bash
+php artisan boost:update --discover
+```
+
+Boost-aware agents will learn to use native `make:* --module` commands, respect module boundaries, validate `module.json`, and run the right diagnostics.
 
 ---
 
@@ -265,8 +361,8 @@ php artisan vendor:publish --tag="modular-config"
 You can customize:
 
 - **Paths**: Move modules to `packages/` or any custom directory.
-- **Stubs**: Enable custom stubs to strictly enforce your team's coding standards.
 - **Composer**: Set default fields (`vendor`, `author`, `license`) for generated `composer.json` files.
+- **Activator**: Swap the default module activator for your own implementation.
 
 ---
 
@@ -276,6 +372,12 @@ We strictly enforce testing. Use the provided test suite to verify your modules:
 
 ```bash
 vendor/bin/pest
+```
+
+For module-level testing:
+
+```bash
+php artisan modular:test Blog
 ```
 
 ---
@@ -304,6 +406,45 @@ We provide first-class support for modern frontend tooling:
 
 ---
 
+## 🔄 Migrating From nwidart/laravel-modules
+
+Laravel Modular v1.2.0 includes a dry-run importer for teams evaluating a move from `nwidart/laravel-modules`:
+
+```bash
+php artisan modular:import-nwidart --dry-run
+php artisan modular:import-nwidart Blog --from=NwidartModules
+```
+
+The importer is intentionally safe: preview first, import deliberately, then run:
+
+```bash
+php artisan modular:refresh
+php artisan modular:doctor
+php artisan modular:check
+```
+
+Read the full guide: [Migration From nwidart](docs/migration-nwidart.md).
+
+---
+
+## 📚 Documentation
+
+- [Installation](docs/installation.md)
+- [Commands](docs/commands.md)
+- [Architecture](docs/architecture.md)
+- [Deployment](docs/deployment.md)
+- [Performance](docs/performance.md)
+- [CI](docs/ci.md)
+- [Laravel Boost](docs/boost.md)
+- [Command Parity](docs/command-parity.md)
+- [Comparison](docs/comparison.md)
+- [Roadmap](docs/roadmap.md)
+- [v1.2.0 Release Notes](docs/release-1.2.0.md)
+
+For a copy-ready release note, see [RELEASE_NOTES_1.2.0.md](RELEASE_NOTES_1.2.0.md).
+
+---
+
 ## 💖 Sponsors
 
 We would like to extend our thanks to the following sponsors for funding Laravel Modular development. If you are interested in becoming a sponsor, please visit the [Laravel Modular GitHub Sponsors page](https://github.com/sponsors/alizharb).
@@ -312,7 +453,7 @@ We would like to extend our thanks to the following sponsors for funding Laravel
 
 ## 🤝 Contributing
 
-We welcome contributions! Please see [CONTRIBUTING](.github/CONTRIBUTING.md) for details.
+We welcome contributions! Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
 
 1. Fork the Project
 2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
@@ -332,6 +473,8 @@ We welcome contributions! Please see [CONTRIBUTING](.github/CONTRIBUTING.md) for
 ## 🔒 Security
 
 If you discover any security-related issues, please email **Ali Harb** at [harbzali@gmail.com](mailto:harbzali@gmail.com).
+
+Please see [SECURITY](SECURITY.md) for the full security policy.
 
 ## 📄 License
 

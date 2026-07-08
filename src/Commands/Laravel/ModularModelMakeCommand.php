@@ -19,38 +19,23 @@ final class ModularModelMakeCommand extends ModelMakeCommand
     /**
      * Execute the console command.
      */
-    public function handle(): void
+    public function handle()
     {
         parent::handle();
+    }
 
-        if ($this->option('all')) {
-            $this->input->setOption('factory', true);
-            $this->input->setOption('seed', true);
-            $this->input->setOption('migration', true);
-            $this->input->setOption('controller', true);
-            $this->input->setOption('policy', true);
-            $this->input->setOption('resource', true);
+    /**
+     * Get the default namespace for modular models.
+     *
+     * @param string $rootNamespace
+     */
+    protected function getDefaultNamespace($rootNamespace): string
+    {
+        if ($this->isModular()) {
+            return $rootNamespace.'\\Models';
         }
 
-        if ($this->option('factory')) {
-            $this->createFactory();
-        }
-
-        if ($this->option('migration')) {
-            $this->createMigration();
-        }
-
-        if ($this->option('seed')) {
-            $this->createSeeder();
-        }
-
-        if ($this->option('controller') || $this->option('resource') || $this->option('api')) {
-            $this->createController();
-        }
-
-        if ($this->option('policy')) {
-            $this->createPolicy();
-        }
+        return parent::getDefaultNamespace($rootNamespace);
     }
 
     /**

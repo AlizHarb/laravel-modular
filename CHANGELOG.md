@@ -2,6 +2,32 @@
 
 All notable changes to `laravel-modular` will be documented in this file.
 
+## v1.2.0 - 2026-07-07
+
+### Added
+
+- **Manifest Validation Engine**: Added reusable runtime validation for `module.json`, covering invalid JSON, required names, semantic versions, typed metadata, providers, dependencies, middleware, events, and directory/name mismatches.
+- **Machine-Readable Diagnostics**: Added `--json` output to `modular:doctor` for CI pipelines, admin interfaces, and automated health checks.
+- **Structured Module Inspection**: Added `--json` output to `modular:debug`, including module metadata, providers, middleware, dependencies, discovered policies/events, resource flags, and validation errors.
+- **Safe Installer Preview**: Added `modular:install --dry-run` to preview installer changes without publishing resources or writing to Composer, Vite, PHPUnit, or workspace configuration files.
+- **Cache Refresh Command**: Added `modular:refresh` to clear and rebuild modular discovery in one command.
+- **Laravel Boost Support**: Added package AI guidelines and an on-demand `laravel-modular-development` skill so Boost-aware agents can generate native module code, inspect modules, validate manifests, and run the right diagnostics.
+- **Observability Commands**: Added `modular:status`, `modular:graph`, and `modular:why` for project health, dependency graphs, and module explanations.
+- **Doctor Fix Mode**: Added `modular:doctor --fix` for safe infrastructure repairs and stale cache refreshes.
+- **Richer Module Metadata**: Added `conflicts` and `provides` support to module discovery, validation, diagnostics, and schema.
+- **nwidart Importer**: Added `modular:import-nwidart` with dry-run support for migrating nwidart-style module directories.
+- **Lifecycle Events**: Added module enable/disable and cache/refresh lifecycle events for integrations.
+- **Adoption Documentation**: Added migration, command parity, performance, CI, comparison, security, and release note documentation for production teams evaluating Laravel Modular.
+
+### Changed
+
+- **Dependency Diagnostics**: Malformed dependency declarations now surface as validation or dependency-check issues instead of causing command errors.
+- **Activator Safety**: Misconfigured custom activators now fail with explicit runtime errors when the class is missing or does not implement the activator contract.
+- **Native Generator Parity**: Improved modular model and factory generation so native flags like `make:model --module=Blog -mcf` keep output in module-native Laravel paths.
+- **README Positioning**: Rebuilt the README around native Laravel workflow, production diagnostics, Laravel Boost, nwidart migration, and adoption confidence.
+
+---
+
 ## v1.1.5 - 2026-02-28
 
 ### Added

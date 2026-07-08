@@ -153,6 +153,8 @@ This is the brain of your module.
     "removable": true,
     "disableable": true,
     "requires": [],
+    "conflicts": [],
+    "provides": ["commerce"],
     "events": {
         "Modules\\Shop\\Events\\OrderPlaced": [
             "Modules\\Shop\\Listeners\\SendOrderInvoice",
@@ -163,9 +165,27 @@ This is the brain of your module.
 ```
 
 - **`route_prefix`**: (String, Optional) Automatically wraps all routes registered in `routes/web.php` and `routes/api.php` with this prefix and namespacing logic. By default, it is empty. If set to `shop-api/v1`, an API route will natively resolve to `api/shop-api/v1/your-route` entirely transparently!
+- **`requires`**: (Array, Optional) Lists modules that must be present and enabled before this module can be enabled.
+- **`conflicts`**: (Array, Optional) Lists modules that cannot be enabled alongside this module.
+- **`provides`**: (Array, Optional) Lists capabilities or service names this module provides for diagnostics and documentation.
 - **`disableable`**: (Boolean) If false, the module cannot be disabled via CLI/UI.
 - **`removable`**: (Boolean) If false, the module cannot be uninstalled via CLI/UI.
 - **`events`**: (Object) Explicit mapping of Event classes to an array of Listener classes. These take precedence over subscriber auto-discovery.
+
+---
+
+## Lifecycle Events
+
+Laravel Modular dispatches lifecycle events so optional integrations can react without coupling the core package to UI or deployment tooling.
+
+| Event | When it fires |
+| :---- | :------------ |
+| `AlizHarb\Modular\Events\ModuleEnabling` | Before a module is enabled |
+| `AlizHarb\Modular\Events\ModuleEnabled` | After a module is enabled and cache is cleared |
+| `AlizHarb\Modular\Events\ModuleDisabling` | Before a module is disabled |
+| `AlizHarb\Modular\Events\ModuleDisabled` | After a module is disabled and cache is cleared |
+| `AlizHarb\Modular\Events\ModularCached` | After modular discovery is cached |
+| `AlizHarb\Modular\Events\ModularRefreshed` | After modular discovery is refreshed |
 
 ---
 

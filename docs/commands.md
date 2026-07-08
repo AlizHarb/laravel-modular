@@ -2,11 +2,10 @@
 
 ## Generator Commands (The Daily Drivers)
 
-These commands create files inside your modules. They support **all** standard Laravel flags (like `-m`, `-c`, `-r`).
+These commands create files inside your modules. They follow native Laravel generator behavior and support standard Laravel flags such as `-m`, `-c`, `-f`, `--api`, and `--resource`.
 
 > [!TIP]
-> **Custom Per-Module Stubs (v1.1.5+)**
-> The `make:*` commands will automatically scan inside your module for a `stubs/` directory first before falling back to application stubs. This allows you to completely override Laravel's generator scaffolding exclusively for one specific module! (e.g., `modules/Shop/stubs/controller.model.stub`)
+> Prefer native Laravel generators with `--module=Name`. Laravel Modular's goal is Laravel-native code organized into module-aware paths, not a separate scaffolding workflow.
 
 ### `make:module`
 
@@ -105,6 +104,8 @@ All of these work exactly as you expect, just add `--module=Name`.
 - `make:rule`
 - `make:seeder`
 - `make:test`
+
+See [Command Parity](command-parity.md) for the complete generator matrix.
 
 ---
 
@@ -233,12 +234,56 @@ php artisan modular:cache
 
 ---
 
+### `modular:refresh`
+
+Clear and rebuild the modular discovery cache in one command.
+
+```bash
+php artisan modular:refresh
+```
+
+---
+
 ### `modular:clear`
 
 Remove the modular discovery cache file.
 
 ```bash
 php artisan modular:clear
+```
+
+---
+
+### `modular:status`
+
+Show a compact project health summary.
+
+```bash
+php artisan modular:status
+php artisan modular:status --json
+```
+
+---
+
+### `modular:graph`
+
+Display the module dependency graph.
+
+```bash
+php artisan modular:graph
+php artisan modular:graph --format=json
+php artisan modular:graph --format=dot
+```
+
+---
+
+### `modular:why`
+
+Explain a module's status, dependencies, dependents, conflicts, and capabilities.
+
+```bash
+php artisan modular:why Shop
+php artisan modular:why Shop --json
 ```
 
 ---
@@ -253,6 +298,9 @@ php artisan modular:debug
 
 # Debug a specific module (deep dive)
 php artisan modular:debug Shop
+
+# Output structured JSON for tooling
+php artisan modular:debug Shop --json
 ```
 
 ---
@@ -273,6 +321,12 @@ Diagnose common configuration issues and architectural integrity.
 
 ```bash
 php artisan modular:doctor
+
+# Output structured JSON for CI or tooling
+php artisan modular:doctor --json
+
+# Apply safe infrastructure fixes
+php artisan modular:doctor --fix
 ```
 
 **What it checks:**
@@ -280,22 +334,37 @@ php artisan modular:doctor
 - **Autoloading**: Verifies PSR-4 registration in `composer.json`.
 - **Circular Dependencies**: Integrates `modular:check` logic.
 - **Metadata**: Validates `module.json` and basic directory structure.
+- **Manifest Schema**: Reports invalid JSON, invalid types, semantic version issues, and directory/name mismatches.
 - **Ghost Modules**: Detects directories in the modules path that are missing a `module.json`.
 - **Duplicate Providers**: Identifies if the same Service Provider is registered in multiple modules.
 - **Asset Linking**: Verifies that the required `public/modules` directory exists.
+- **Cache Freshness**: Warns when cached module metadata no longer matches module manifests.
+
+---
+
+### `modular:import-nwidart`
+
+Import modules from a `nwidart/laravel-modules` style directory.
+
+```bash
+php artisan modular:import-nwidart --dry-run
+php artisan modular:import-nwidart Blog --from=NwidartModules
+```
+
+> On case-insensitive filesystems, `Modules` and `modules` may resolve to the same path. Use `--to` with a distinct target when needed.
 
 ---
 
 ### `modular:publish`
 
-Publish configuration and stub files for customization.
+Publish package resources for advanced customization.
 
 ```bash
 php artisan modular:publish
 ```
 
-- Select `config` to publish `config/modular.php`.
-- Select `stubs` to publish generator stubs.
+- Publish configuration when you need to customize module paths, activators, cache paths, Composer metadata, or asset behavior.
+- Prefer native Laravel generator commands and conventions for day-to-day development.
 
 ---
 

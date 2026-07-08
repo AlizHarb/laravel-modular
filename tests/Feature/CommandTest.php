@@ -51,6 +51,34 @@ it('can create a controller in the module app directory', function () {
     expect(File::get($file))->toContain('class TestController');
 });
 
+it('preserves native model generator flags inside modules', function () {
+    $this->artisan('make:module', ['name' => 'NativeFlagsModule']);
+
+    app()->forgetInstance(ModuleRegistry::class);
+
+    $this->artisan('make:model Post --module=NativeFlagsModule -mcf')
+        ->assertExitCode(0);
+
+    expect(File::exists(base_path('modules/NativeFlagsModule/app/Models/Post.php')))->toBeTrue();
+    expect(File::isDirectory(base_path('modules/NativeFlagsModule/database/migrations')))->toBeTrue();
+    expect(File::exists(base_path('modules/NativeFlagsModule/database/factories/PostFactory.php')))->toBeTrue();
+    expect(File::exists(base_path('modules/NativeFlagsModule/app/Http/Controllers/PostController.php')))->toBeTrue();
+});
+
+it('preserves native api controller flags inside modules', function () {
+    $this->artisan('make:module', ['name' => 'NativeApiModule']);
+
+    app()->forgetInstance(ModuleRegistry::class);
+
+    $this->artisan('make:controller Api/PostController --module=NativeApiModule --api')
+        ->assertExitCode(0);
+
+    $file = base_path('modules/NativeApiModule/app/Http/Controllers/Api/PostController.php');
+
+    expect(File::exists($file))->toBeTrue();
+    expect(File::get($file))->toContain('class PostController');
+});
+
 it('modular:doctor reports healthy when all requirements are met', function () {
     File::ensureDirectoryExists(base_path('config'));
     File::put(base_path('composer.json'), json_encode([

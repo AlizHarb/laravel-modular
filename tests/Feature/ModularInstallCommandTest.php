@@ -10,6 +10,7 @@ afterEach(function () {
     File::delete(base_path('vite.config.js'));
     File::delete(base_path('composer.json'));
     File::delete(base_path('vite.modular.js'));
+    File::delete(base_path('vite.base.js'));
     File::delete(base_path('phpunit.xml'));
 });
 
@@ -92,4 +93,35 @@ it('can install modular and show manual configuration if declined', function () 
     $phpunitContent = File::get($phpunitXml);
     expect($phpunitContent)->not->toContain('./modules/*/tests/Feature');
     expect($phpunitContent)->not->toContain('./modules/*/tests/Unit');
+});
+
+it('can preview install changes without writing files', function () {
+    $viteConfig = base_path('vite.config.js');
+    $composerJson = base_path('composer.json');
+    $phpUnitXml = base_path('phpunit.xml');
+
+    $originalVite = "import { defineConfig } from 'vite';\nimport laravel from 'laravel-vite-plugin';\n\nexport default defineConfig({\n    plugins: [\n        laravel({\n            input: ['resources/css/app.css', 'resources/js/app.js'],\n            refresh: true,\n        }),\n    ],\n});";
+    $originalComposer = json_encode([
+        'autoload' => [
+            'psr-4' => [
+                'App\\' => 'app/',
+            ],
+        ],
+    ], JSON_PRETTY_PRINT);
+    $originalPhpUnit = '<?xml version="1.0" encoding="UTF-8"?><phpunit><testsuites><testsuite name="Feature"><directory suffix="Test.php">./tests/Feature</directory></testsuite><testsuite name="Unit"><directory suffix="Test.php">./tests/Unit</directory></testsuite></testsuites></phpunit>';
+
+    File::put($viteConfig, $originalVite);
+    File::put($composerJson, $originalComposer);
+    File::put($phpUnitXml, $originalPhpUnit);
+
+    $this->artisan('modular:install --dry-run')
+        ->expectsOutputToContain('Dry run enabled. No files will be changed and no resources will be published.')
+        ->expectsOutputToContain('Laravel Modular install preview completed.')
+        ->assertExitCode(0);
+
+    expect(File::get($viteConfig))->toBe($originalVite);
+    expect(File::get($composerJson))->toBe($originalComposer);
+    expect(File::get($phpUnitXml))->toBe($originalPhpUnit);
+    expect(File::exists(base_path('vite.modular.js')))->toBeFalse();
+    expect(File::exists(base_path('vite.base.js')))->toBeFalse();
 });

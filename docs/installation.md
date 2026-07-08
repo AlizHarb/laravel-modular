@@ -22,6 +22,13 @@ Run the installation command to automatically configure your application (includ
 ```bash
 php artisan modular:install
 ```
+
+Preview the installer plan without writing files:
+
+```bash
+php artisan modular:install --dry-run
+```
+
 > **Note:** This command will also offer to configure your `composer.json` test script to run both application and module tests in isolation.
 
 ## First Steps

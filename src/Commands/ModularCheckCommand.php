@@ -40,6 +40,13 @@ class ModularCheckCommand extends Command
             $graph[$name] = [];
 
             foreach ($requires as $requirement) {
+                if (! is_string($requirement) || trim($requirement) === '') {
+                    $violations[] = "<fg=red>{$name}</> has an invalid dependency declaration.";
+                    $status = self::FAILURE;
+
+                    continue;
+                }
+
                 // Support "Module:^1.0" or "Module"
                 $parts = explode(':', $requirement);
                 $requiredModule = $parts[0];
@@ -66,6 +73,22 @@ class ModularCheckCommand extends Command
                         $violations[] = "<fg=red>{$name}</> requires <fg=yellow>{$requiredModule}:{$constraint}</>, but <fg=green>{$installedVersion}</> is installed.";
                         $status = self::FAILURE;
                     }
+                }
+            }
+
+            foreach (($config['conflicts'] ?? []) as $conflict) {
+                if (! is_string($conflict) || trim($conflict) === '') {
+                    $violations[] = "<fg=red>{$name}</> has an invalid conflict declaration.";
+                    $status = self::FAILURE;
+
+                    continue;
+                }
+
+                $conflictingModule = explode(':', $conflict)[0];
+
+                if ($registry->moduleExists($conflictingModule) && $registry->isEnabled($conflictingModule)) {
+                    $violations[] = "<fg=red>{$name}</> conflicts with enabled module <fg=yellow>{$conflictingModule}</>.";
+                    $status = self::FAILURE;
                 }
             }
         }

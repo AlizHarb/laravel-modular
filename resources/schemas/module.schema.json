@@ -64,6 +64,20 @@
             },
             "description": "List of modules this module depends on."
         },
+        "conflicts": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            },
+            "description": "List of modules that cannot be enabled with this module."
+        },
+        "provides": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            },
+            "description": "Capabilities or service names this module provides."
+        },
         "events": {
             "type": "object",
             "patternProperties": {
