@@ -20,6 +20,25 @@ trait ModularCommand
             ['module', null, InputOption::VALUE_REQUIRED, 'The module to create the component in'],
         ];
     }
+    
+    /**
+     * Laravel 13 compatibility. 
+     * 
+     * Laravel 13 builds the command definition through configureDefaults() 
+     * instead of using the old getOptions() mechanism. 
+     */
+    protected function configureDefaults(): void 
+    { 
+        parent::configureDefaults(); 
+        $this->getDefinition()->addOption( 
+            new InputOption( 
+                'module', 
+                null, 
+                InputOption::VALUE_REQUIRED, 
+                'The module to create the component in' 
+            ) 
+        ); 
+    }
 
     /**
      * Get the console command options.
