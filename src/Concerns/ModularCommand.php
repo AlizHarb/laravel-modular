@@ -29,15 +29,19 @@ trait ModularCommand
      */
     protected function configureDefaults(): void 
     { 
-        parent::configureDefaults(); 
-        $this->getDefinition()->addOption( 
-            new InputOption( 
-                'module', 
-                null, 
-                InputOption::VALUE_REQUIRED, 
-                'The module to create the component in' 
-            ) 
-        ); 
+        if (method_exists(parent::class, 'configureDefaults')) {
+            // Parent method doesn't exist in Laravel 12 environments
+            // @phpstan-ignore-next-line
+            parent::configureDefaults(); 
+            $this->getDefinition()->addOption( 
+                new InputOption( 
+                    'module', 
+                    null, 
+                    InputOption::VALUE_REQUIRED, 
+                    'The module to create the component in' 
+                ) 
+            ); 
+        }
     }
 
     /**
