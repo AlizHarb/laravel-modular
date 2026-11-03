@@ -33,14 +33,18 @@ trait ModularCommand
             // Parent method doesn't exist in Laravel 12 environments
             // @phpstan-ignore-next-line
             parent::configureDefaults(); 
-            $this->getDefinition()->addOption( 
-                new InputOption( 
-                    'module', 
-                    null, 
-                    InputOption::VALUE_REQUIRED, 
-                    'The module to create the component in' 
-                ) 
-            ); 
+            // add --module option only if it's not already defined
+            // for example: it already exists in $this->signature on make:migration 
+            if (!$this->getDefinition()->hasOption('module')) {
+                $this->getDefinition()->addOption( 
+                    new InputOption( 
+                        'module', 
+                        null, 
+                        InputOption::VALUE_REQUIRED, 
+                        'The module to create the component in' 
+                    ) 
+                ); 
+            }
         }
     }
 
